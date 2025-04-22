@@ -63,10 +63,10 @@ void Error_Handler(void);
 #define LCD_DC_GPIO_Port GPIOC
 #define LCD_CS_Pin GPIO_PIN_5
 #define LCD_CS_GPIO_Port GPIOC
-#define LED_B_Pin GPIO_PIN_15
-#define LED_B_GPIO_Port GPIOD
 #define LED_G_Pin GPIO_PIN_15
-#define LED_G_GPIO_Port GPIOA
+#define LED_G_GPIO_Port GPIOD
+#define LED_B_Pin GPIO_PIN_15
+#define LED_B_GPIO_Port GPIOA
 #define LED_R_Pin GPIO_PIN_3
 #define LED_R_GPIO_Port GPIOB
 

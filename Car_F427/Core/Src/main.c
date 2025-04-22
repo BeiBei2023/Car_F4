@@ -21,6 +21,7 @@
 #include "cmsis_os.h"
 #include "can.h"
 #include "dma.h"
+#include "i2c.h"
 #include "spi.h"
 #include "usart.h"
 #include "gpio.h"
@@ -33,6 +34,8 @@
 
 #include "st7735s.h"
 #include "fonts.h"
+
+#include "aht20.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -116,6 +119,7 @@ int main(void)
   MX_CAN1_Init();
   MX_CAN2_Init();
   MX_SPI1_Init();
+  MX_I2C2_Init();
   /* USER CODE BEGIN 2 */
 
   HAL_UARTEx_ReceiveToIdle_DMA(&huart1, RcUartBuffer, 25); // 用IDLE和中断接收
@@ -126,39 +130,20 @@ int main(void)
 
   ST7735_Init();
 
-      // Check colors
-      ST7735_FillScreen(ST7735_BLACK);
-      ST7735_WriteString(0, 0, "BLACK", Font_16x26, ST7735_WHITE, ST7735_BLACK);
-      HAL_Delay(500);
-  
-      ST7735_FillScreen(ST7735_BLUE);
-      ST7735_WriteString(0, 0, "BLUE", Font_16x26, ST7735_BLACK, ST7735_BLUE);
-      HAL_Delay(500);
-  
-      ST7735_FillScreen(ST7735_RED);
-      ST7735_WriteString(0, 0, "RED", Font_16x26, ST7735_BLACK, ST7735_RED);
-      HAL_Delay(500);
-  
-      ST7735_FillScreen(ST7735_GREEN);
-      ST7735_WriteString(0, 0, "GREEN", Font_16x26, ST7735_BLACK, ST7735_GREEN);
-      HAL_Delay(500);
-  
-      ST7735_FillScreen(ST7735_CYAN);
-      ST7735_WriteString(0, 0, "CYAN", Font_16x26, ST7735_BLACK, ST7735_CYAN);
-      HAL_Delay(500);
-  
-      ST7735_FillScreen(ST7735_MAGENTA);
-      ST7735_WriteString(0, 0, "MAGENTA", Font_16x26, ST7735_BLACK, ST7735_MAGENTA);
-      HAL_Delay(500);
-  
-      ST7735_FillScreen(ST7735_YELLOW);
-      ST7735_WriteString(0, 0, "YELLOW", Font_16x26, ST7735_BLACK, ST7735_YELLOW);
-      HAL_Delay(500);
-  
-      ST7735_FillScreen(ST7735_WHITE);
-      ST7735_WriteString(0, 0, "WHITE", Font_16x26, ST7735_BLACK, ST7735_WHITE);
-      HAL_Delay(500);
+  AHT20_Data_t sensorData;
+  AHT20_Read(&sensorData);
 
+  char tempStr[32];
+  char humStr[32];
+
+  sprintf(tempStr, "Temp: %.2f C", sensorData.Temperature);
+  sprintf(humStr, "Hum: %.2f %%", sensorData.Humidity);
+
+  ST7735_FillScreen(ST7735_BLACK); // 清屏
+  ST7735_WriteString(0, 0, tempStr, Font_7x10, ST7735_WHITE, ST7735_BLACK);
+  ST7735_WriteString(0, 15, humStr, Font_7x10, ST7735_WHITE, ST7735_BLACK);
+
+  
 
   /* USER CODE END 2 */
 

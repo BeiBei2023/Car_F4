@@ -5,6 +5,7 @@
 "car_f427\freertos.o"
 "car_f427\can.o"
 "car_f427\dma.o"
+"car_f427\i2c.o"
 "car_f427\spi.o"
 "car_f427\usart.o"
 "car_f427\stm32f4xx_it.o"
@@ -26,6 +27,8 @@
 "car_f427\stm32f4xx_hal_cortex.o"
 "car_f427\stm32f4xx_hal.o"
 "car_f427\stm32f4xx_hal_exti.o"
+"car_f427\stm32f4xx_hal_i2c.o"
+"car_f427\stm32f4xx_hal_i2c_ex.o"
 "car_f427\stm32f4xx_hal_spi.o"
 "car_f427\stm32f4xx_hal_uart.o"
 "car_f427\system_stm32f4xx.o"
@@ -51,6 +54,7 @@
 "car_f427\wheel.o"
 "car_f427\st7735s.o"
 "car_f427\fonts.o"
+"car_f427\aht20.o"
 --strict --scatter "Car_F427\Car_F427.sct"
 --summary_stderr --info summarysizes --map --load_addr_map_info --xref --callgraph --symbols
 --info sizes --info totals --info unused --info veneers

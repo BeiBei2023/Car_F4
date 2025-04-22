@@ -27,38 +27,16 @@ Project File Date:  04/22/2025
 <h2>Output:</h2>
 *** Using Compiler 'V5.06 update 7 (build 960)', folder: 'D:\MDK5\Keil_v5\ARM\ARMCC\Bin'
 Build target 'Car_F427'
-compiling fonts.c...
-compiling st7735s.c...
-..\BSP\ST7735S\st7735s.h(251): warning:  #1295-D: Deprecated declaration ST7735_Unselect - give arg types
-  void ST7735_Unselect();
-..\BSP\ST7735S\st7735s.h(255): error:  #20: identifier "FontDef" is undefined
-  void ST7735_WriteString(uint16_t x, uint16_t y, const char* str, FontDef font, uint16_t color, uint16_t bgcolor);
-..\BSP\ST7735S\st7735s.c(178): error:  #20: identifier "FontDef" is undefined
-  static void ST7735_WriteChar(uint16_t x, uint16_t y, char ch, FontDef font, uint16_t color, uint16_t bgcolor) {
-..\BSP\ST7735S\st7735s.c(214): error:  #20: identifier "FontDef" is undefined
-  void ST7735_WriteString(uint16_t x, uint16_t y, const char* str, FontDef font, uint16_t color, uint16_t bgcolor) {
-..\BSP\ST7735S\st7735s.c: 1 warning, 3 errors
-compiling main.c...
-../BSP/ST7735S/st7735s.h(251): warning:  #1295-D: Deprecated declaration ST7735_Unselect - give arg types
-  void ST7735_Unselect();
-../BSP/ST7735S/st7735s.h(255): error:  #20: identifier "FontDef" is undefined
-  void ST7735_WriteString(uint16_t x, uint16_t y, const char* str, FontDef font, uint16_t color, uint16_t bgcolor);
-../Core/Src/main.c: 1 warning, 1 error
-compiling wheel.c...
-../BSP/ST7735S/st7735s.h(251): warning:  #1295-D: Deprecated declaration ST7735_Unselect - give arg types
-  void ST7735_Unselect();
-../BSP/ST7735S/st7735s.h(255): error:  #20: identifier "FontDef" is undefined
-  void ST7735_WriteString(uint16_t x, uint16_t y, const char* str, FontDef font, uint16_t color, uint16_t bgcolor);
-..\BSP\WHEEL\wheel.c: 1 warning, 1 error
-compiling send_motor_data.c...
-../BSP/ST7735S/st7735s.h(251): warning:  #1295-D: Deprecated declaration ST7735_Unselect - give arg types
-  void ST7735_Unselect();
-../BSP/ST7735S/st7735s.h(255): error:  #20: identifier "FontDef" is undefined
-  void ST7735_WriteString(uint16_t x, uint16_t y, const char* str, FontDef font, uint16_t color, uint16_t bgcolor);
-..\BSP\TASKS\send_motor_data.c(24): warning:  #1-D: last line of file ends without a newline
+compiling aht20.c...
+..\BSP\AHT20\aht20.h(11): warning:  #1295-D: Deprecated declaration AHT20_Init - give arg types
+  void AHT20_Init();
+..\BSP\AHT20\aht20.c(46): warning:  #1-D: last line of file ends without a newline
   }
-..\BSP\TASKS\send_motor_data.c: 2 warnings, 1 error
-"Car_F427\Car_F427.axf" - 6 Error(s), 5 Warning(s).
+..\BSP\AHT20\aht20.c: 2 warnings, 0 errors
+linking...
+Program Size: Code=31160 RO-data=6536 RW-data=196 ZI-data=44692  
+FromELF: creating hex file...
+"Car_F427\Car_F427.axf" - 0 Error(s), 2 Warning(s).
 
 <h2>Software Packages used:</h2>
 
@@ -81,7 +59,6 @@ Package Vendor: Keil
 
    * Component: ARM::CMSIS:CORE@6.1.0
       Include file:  CMSIS/Core/Include/tz_context.h
-Target not created.
 Build Time Elapsed:  00:00:02
 </pre>
 </body>

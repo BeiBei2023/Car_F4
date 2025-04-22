@@ -43,6 +43,9 @@
                     "path": "../Core/Src/dma.c"
                   },
                   {
+                    "path": "../Core/Src/i2c.c"
+                  },
+                  {
                     "path": "../Core/Src/spi.c"
                   },
                   {
@@ -118,6 +121,12 @@
               },
               {
                 "path": "../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_exti.c"
+              },
+              {
+                "path": "../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_i2c.c"
+              },
+              {
+                "path": "../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_i2c_ex.c"
               },
               {
                 "path": "../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_spi.c"
@@ -259,6 +268,15 @@
               },
               {
                 "path": "../BSP/ST7735S/fonts.c"
+              }
+            ],
+            "folders": []
+          },
+          {
+            "name": "AHT20",
+            "files": [
+              {
+                "path": "../BSP/AHT20/aht20.c"
               }
             ],
             "folders": []
@@ -440,6 +458,7 @@
           "../BSP/TASKS",
           "../BSP/WHEEL",
           "../BSP/ST7735S",
+          "../BSP/AHT20",
           "../MDK-ARM/RTE/_Car_F427"
         ],
         "libList": [],
