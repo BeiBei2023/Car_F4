@@ -32,10 +32,7 @@
 #include "log.h"
 #include "sever_init.h"
 
-#include "st7735s.h"
-#include "fonts.h"
 
-#include "aht20.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -126,24 +123,11 @@ int main(void)
   __HAL_DMA_DISABLE_IT(&hdma_usart1_rx, DMA_IT_HT);        // 用IDLE和中断接收
 
   init(); // 初始化电机和PID
-  HAL_GPIO_WritePin(LED_G_GPIO_Port, LED_G_Pin, GPIO_PIN_SET);
+  //HAL_GPIO_WritePin(LED_G_GPIO_Port, LED_G_Pin, GPIO_PIN_SET);
 
-  ST7735_Init();
 
-  AHT20_Data_t sensorData;
-  AHT20_Read(&sensorData);
 
-  char tempStr[32];
-  char humStr[32];
 
-  sprintf(tempStr, "Temp: %.2f C", sensorData.Temperature);
-  sprintf(humStr, "Hum: %.2f %%", sensorData.Humidity);
-
-  ST7735_FillScreen(ST7735_BLACK); // 清屏
-  ST7735_WriteString(0, 0, tempStr, Font_7x10, ST7735_WHITE, ST7735_BLACK);
-  ST7735_WriteString(0, 15, humStr, Font_7x10, ST7735_WHITE, ST7735_BLACK);
-
-  
 
   /* USER CODE END 2 */
 

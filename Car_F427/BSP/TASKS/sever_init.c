@@ -1,6 +1,9 @@
 #include "sever_init.h"
 #include "pid.h"
 #include "callback.h"
+#include "st7735s.h"
+#include "fonts.h"
+#include "aht20.h"
 
 void init(void)
 {
@@ -44,7 +47,8 @@ void init(void)
     /*-----------------------------------------------------------------------*/
 
 
-
+    ST7735_Init();
+    AHT20_Init();
 
     EMLOG(LOG_INFO, "init ok");
 }
