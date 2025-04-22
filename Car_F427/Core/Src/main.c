@@ -19,6 +19,7 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "cmsis_os.h"
+#include "adc.h"
 #include "can.h"
 #include "dma.h"
 #include "i2c.h"
@@ -117,10 +118,13 @@ int main(void)
   MX_CAN2_Init();
   MX_SPI1_Init();
   MX_I2C2_Init();
+  MX_ADC1_Init();
   /* USER CODE BEGIN 2 */
 
   HAL_UARTEx_ReceiveToIdle_DMA(&huart1, RcUartBuffer, 25); // 用IDLE和中断接收
   __HAL_DMA_DISABLE_IT(&hdma_usart1_rx, DMA_IT_HT);        // 用IDLE和中断接收
+
+  HAL_ADC_Start_IT(&hadc1); // 开始ADC转换
 
   init(); // 初始化电机和PID
   //HAL_GPIO_WritePin(LED_G_GPIO_Port, LED_G_Pin, GPIO_PIN_SET);

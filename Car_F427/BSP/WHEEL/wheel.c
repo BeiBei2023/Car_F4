@@ -1,6 +1,7 @@
 #include "wheel.h"
 #include "st7735s.h"
 #include "aht20.h"
+#include "adc_v.h"
 
 RobotState g_robot;
 /*
@@ -92,17 +93,22 @@ void task_led_attr(void *argument)
     {
        
         AHT20_Read(&sensorData);
+        
       
         char tempStr[32];
         char humStr[32];
+        char adcStr[32];
       
         sprintf(tempStr, "Temp: %.2f C", sensorData.Temperature);
         sprintf(humStr, "Hum: %.2f %%", sensorData.Humidity);
+        sprintf(adcStr, "ADC: %.2f V",adc_v.v_in );
       
         ST7735_FillScreen(ST7735_BLACK); // 清屏
         ST7735_WriteString(0, 0, tempStr, Font_7x10, ST7735_WHITE, ST7735_BLACK);
         ST7735_WriteString(0, 15, humStr, Font_7x10, ST7735_WHITE, ST7735_BLACK);
+        ST7735_WriteString(0, 30, adcStr, Font_7x10, ST7735_WHITE, ST7735_BLACK);
       
+        HAL_GPIO_TogglePin(LED_B_GPIO_Port,LED_B_Pin);
         
         vTaskDelay(pdMS_TO_TICKS(1000)); // 200ms检测周期
     }

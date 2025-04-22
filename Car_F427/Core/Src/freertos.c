@@ -79,7 +79,7 @@ const osThreadAttr_t Task_Remote_attributes = {
 osThreadId_t Task_LEDHandle;
 const osThreadAttr_t Task_LED_attributes = {
   .name = "Task_LED",
-  .stack_size = 128 * 4,
+  .stack_size = 1024 * 4,
   .priority = (osPriority_t) osPriorityLow,
 };
 /* Definitions for mutex */

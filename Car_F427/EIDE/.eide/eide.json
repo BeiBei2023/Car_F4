@@ -37,6 +37,9 @@
                     "path": "../Core/Src/freertos.c"
                   },
                   {
+                    "path": "../Core/Src/adc.c"
+                  },
+                  {
                     "path": "../Core/Src/can.c"
                   },
                   {
@@ -81,7 +84,13 @@
                 "path": "../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_tim_ex.c"
               },
               {
-                "path": "../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_can.c"
+                "path": "../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_adc.c"
+              },
+              {
+                "path": "../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_adc_ex.c"
+              },
+              {
+                "path": "../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_ll_adc.c"
               },
               {
                 "path": "../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_rcc.c"
@@ -121,6 +130,9 @@
               },
               {
                 "path": "../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_exti.c"
+              },
+              {
+                "path": "../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_can.c"
               },
               {
                 "path": "../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_i2c.c"
@@ -277,6 +289,15 @@
             "files": [
               {
                 "path": "../BSP/AHT20/aht20.c"
+              }
+            ],
+            "folders": []
+          },
+          {
+            "name": "ADC",
+            "files": [
+              {
+                "path": "../BSP/ADC/adc_v.c"
               }
             ],
             "folders": []
@@ -459,6 +480,7 @@
           "../BSP/WHEEL",
           "../BSP/ST7735S",
           "../BSP/AHT20",
+          "../BSP/ADC",
           "../MDK-ARM/RTE/_Car_F427"
         ],
         "libList": [],
