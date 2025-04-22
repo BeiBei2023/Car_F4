@@ -1,21 +1,14 @@
 #include "motor.h"
 #include "cmsis_os.h"
 
-
-
-
-
 MotorRxData_t motor_data[CAN_MOTOR_NUM] = {0}; // 存放实时的电机数据
 // 电机的CAN ID
 const uint32_t motor_id[CAN_MOTOR_NUM] = {0x201, 0x202, 0x203, 0x204};
 
 static int16_t clamp(int16_t value, int16_t min, int16_t max)
 {
-    return (value < min) ? min : (value > max) ? max
-                                               : value;
+    return (value < min) ? min : (value > max) ? max: value;
 }
-
-
 
 /**
  * @brief   初始化电机控制相关的CAN模块和PID控制器
@@ -37,9 +30,7 @@ void related_initialization_of_motors(CAN_HandleTypeDef *hcan, CAN_Call_Back Cal
                                0);
         // 设置过滤器,设置成0，不过滤所有ID的包
     }
-
 }
-
 
 /**
  * @brief 设置目标的速度,通过电机的ID顺序传入速度值给PID计算输出值
@@ -53,36 +44,34 @@ void set_motor_target_speed(int16_t new_target_speed[CAN_MOTOR_NUM])
 {
 
     // int16_t delta_speed[CAN_MOTOR_NUM]; // 速度增量(速度差)
-    int16_t max_speed_change = 2500; // 最大速度增量,加减速用，是0到最大速度的不会异常的最大值
+    int16_t max_speed_change = 500; // 最大速度增量,加减速用，是0到最大速度的不会异常的最大值
 
     for (int i = 0; i < CAN_MOTOR_NUM; i++)
     {
         motor_data[i].motor_target_speed = clamp(new_target_speed[i],
-                                motor_data[i].motor_omega - max_speed_change,
-                                motor_data[i].motor_omega + max_speed_change);
-
-        // EMLOG(LOG_DEBUG, "set_motor_target_speed[%d] = %d", i, motor_data[i].motor_target_speed);
-        // EMLOG(LOG_DEBUG, "motor_data[%d].motor_omega = %d", i, motor_data[i].motor_omega);
-        // EMLOG(LOG_DEBUG, "target_speed[%d] = %d", i, motor_data[i].motor_target_speed);
+                                                 motor_data[i].motor_omega - max_speed_change,
+                                                 motor_data[i].motor_omega + max_speed_change);
     }
 }
 
-/**
- * @brief 定期调用PID计算，并且更新电机的输出，返回值是pos_out或者delta_out。但不用返回值，直接访问
- * pid_speed[1].pos_out
- *
- */
-void motor_pid_update(void)
-{
-    for (int i = 0; i < 4; i++)
-    {
-        // 填入的参数是：PID控制参数，实际速度，目标速度
-        pid_calc(&pid_speed[i], motor_data[i].motor_omega, motor_data[i].motor_target_speed);
-        /*输出对应的参数*/
-        //EMLOG(LOG_DEBUG, "Motor_PID_Update is %d", pid_speed[i].delta_out);
-    }
-    // 假设需要发送16位整型数据（需确保数据范围在±32767内）
-}
+
+ 
+// /**
+//  * @brief 定期调用PID计算，并且更新电机的输出，返回值是pos_out或者delta_out。但不用返回值，直接访问
+//  * pid_speed[1].pos_out
+//  *
+//  */
+// void motor_pid_update(void)
+// {
+//     for (int i = 0; i < 4; i++)
+//     {
+//         // 填入的参数是：PID控制参数，实际速度，目标速度
+//         pid_calc(&pid_speed[i], motor_data[i].motor_omega, motor_data[i].motor_target_speed);
+//         /*输出对应的参数*/
+//         // EMLOG(LOG_DEBUG, "Motor_PID_Update is %d", pid_speed[i].delta_out);
+//     }
+//     // 假设需要发送16位整型数据（需确保数据范围在±32767内）
+// }
 
 /**
  * @brief 设置电机的速度，也就是将经过PID计算的速度通过CAN总线发给电机
@@ -100,7 +89,6 @@ uint8_t send_motor_speed_commands(CAN_HandleTypeDef *hcan,
         CAN1_0x200_Tx_Data[2 * i] = speeds[i] >> 8;       // 高位
         CAN1_0x200_Tx_Data[2 * i + 1] = speeds[i] & 0xFF; // 低位
     }
-    
 
     return CAN_Send_Data(hcan, CAN_ID_MOTOR_CONTROL, CAN1_0x200_Tx_Data, 8);
 }

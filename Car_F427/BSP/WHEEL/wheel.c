@@ -1,4 +1,5 @@
 #include "wheel.h"
+#include "st7735s.h"
 
 RobotState g_robot;
 /*
@@ -24,8 +25,12 @@ RobotState g_robot;
 
 void task_remote_attr(void *argument)
 {
-    const uint32_t task_period = 10;                // 10ms周期（100Hz）
+    const uint32_t task_period = 7;                 // 10ms周期（100Hz）
     TickType_t xLastWakeTime = xTaskGetTickCount(); // 记录上次执行时间
+    g_robot.motor_rpm[0] = 0;
+    g_robot.motor_rpm[0] = 0;
+    g_robot.motor_rpm[0] = 0;
+    g_robot.motor_rpm[0] = 0;
 
     for (;;)
     {
@@ -49,6 +54,7 @@ void task_remote_attr(void *argument)
         const float rpm_factor = 60.0f / (2 * 3.1415926f * WHEEL_RADIUS) / cosf(180 / 4) * 19;
 
         float speed_scale = 1.0f, omega_scale = 1.0f;
+
         switch (g_robot.speed_mode)
         {
         case 0: // 低速档
@@ -80,36 +86,8 @@ void task_remote_attr(void *argument)
 }
 void task_led_attr(void *argument)
 {
-    uint8_t last_mode = 0xff; // 无效初始值
     for (;;)
     {
-
-        /* 模式变化时更新LED */
-        if (last_mode != g_robot.speed_mode)
-        {
-            switch (g_robot.speed_mode)
-            {
-            case 0: // 红灯
-                HAL_GPIO_WritePin(LED_R_GPIO_Port, LED_R_Pin, GPIO_PIN_SET);
-                HAL_GPIO_WritePin(LED_G_GPIO_Port, LED_G_Pin, GPIO_PIN_RESET);
-                HAL_GPIO_WritePin(LED_B_GPIO_Port, LED_B_Pin, GPIO_PIN_RESET);
-                break; // 正确放置在case分支内
-            case 1:    // 绿灯
-                HAL_GPIO_WritePin(LED_R_GPIO_Port, LED_R_Pin, GPIO_PIN_RESET);
-                HAL_GPIO_WritePin(LED_G_GPIO_Port, LED_G_Pin, GPIO_PIN_SET);
-                HAL_GPIO_WritePin(LED_B_GPIO_Port, LED_B_Pin, GPIO_PIN_RESET);
-                break; // 正确放置在case分支内
-            case 2:    // 蓝灯
-                HAL_GPIO_WritePin(LED_R_GPIO_Port, LED_R_Pin, GPIO_PIN_RESET);
-                HAL_GPIO_WritePin(LED_G_GPIO_Port, LED_G_Pin, GPIO_PIN_RESET);
-                HAL_GPIO_WritePin(LED_B_GPIO_Port, LED_B_Pin, GPIO_PIN_SET);
-                break; // 正确放置在case分支内
-            default:
-                break;
-            }
-            last_mode = g_robot.speed_mode;
-        }
-
-        vTaskDelay(pdMS_TO_TICKS(200)); // 200ms检测周期
+        vTaskDelay(pdMS_TO_TICKS(2)); // 200ms检测周期
     }
 }

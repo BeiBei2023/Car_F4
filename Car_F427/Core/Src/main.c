@@ -21,6 +21,7 @@
 #include "cmsis_os.h"
 #include "can.h"
 #include "dma.h"
+#include "spi.h"
 #include "usart.h"
 #include "gpio.h"
 
@@ -30,7 +31,8 @@
 #include "log.h"
 #include "sever_init.h"
 
-
+#include "st7735s.h"
+#include "fonts.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -51,13 +53,14 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
-extern DMA_HandleTypeDef hdma_usart1_rx;
 
-uint8_t RcUartBuffer[25];
+uint8_t RcUartBuffer[25]; // 正确声明
+
 void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t Size)
 {
   if (huart->Instance == USART1)
   {
+
     sbus_decode_frame(RcUartBuffer);
     HAL_UARTEx_ReceiveToIdle_DMA(&huart1, RcUartBuffer, 25); // 用IDLE和中断接收
     __HAL_DMA_DISABLE_IT(&hdma_usart1_rx, DMA_IT_HT);
@@ -111,14 +114,50 @@ int main(void)
   MX_USART1_UART_Init();
   MX_USART2_UART_Init();
   MX_CAN1_Init();
+  MX_CAN2_Init();
+  MX_SPI1_Init();
   /* USER CODE BEGIN 2 */
+
   HAL_UARTEx_ReceiveToIdle_DMA(&huart1, RcUartBuffer, 25); // 用IDLE和中断接收
-  __HAL_DMA_DISABLE_IT(&hdma_usart1_rx, DMA_IT_HT);
+  __HAL_DMA_DISABLE_IT(&hdma_usart1_rx, DMA_IT_HT);        // 用IDLE和中断接收
 
-  init(); //初始化电机和PID
+  init(); // 初始化电机和PID
+  HAL_GPIO_WritePin(LED_G_GPIO_Port, LED_G_Pin, GPIO_PIN_SET);
 
+  ST7735_Init();
 
-
+      // Check colors
+      ST7735_FillScreen(ST7735_BLACK);
+      ST7735_WriteString(0, 0, "BLACK", Font_16x26, ST7735_WHITE, ST7735_BLACK);
+      HAL_Delay(500);
+  
+      ST7735_FillScreen(ST7735_BLUE);
+      ST7735_WriteString(0, 0, "BLUE", Font_16x26, ST7735_BLACK, ST7735_BLUE);
+      HAL_Delay(500);
+  
+      ST7735_FillScreen(ST7735_RED);
+      ST7735_WriteString(0, 0, "RED", Font_16x26, ST7735_BLACK, ST7735_RED);
+      HAL_Delay(500);
+  
+      ST7735_FillScreen(ST7735_GREEN);
+      ST7735_WriteString(0, 0, "GREEN", Font_16x26, ST7735_BLACK, ST7735_GREEN);
+      HAL_Delay(500);
+  
+      ST7735_FillScreen(ST7735_CYAN);
+      ST7735_WriteString(0, 0, "CYAN", Font_16x26, ST7735_BLACK, ST7735_CYAN);
+      HAL_Delay(500);
+  
+      ST7735_FillScreen(ST7735_MAGENTA);
+      ST7735_WriteString(0, 0, "MAGENTA", Font_16x26, ST7735_BLACK, ST7735_MAGENTA);
+      HAL_Delay(500);
+  
+      ST7735_FillScreen(ST7735_YELLOW);
+      ST7735_WriteString(0, 0, "YELLOW", Font_16x26, ST7735_BLACK, ST7735_YELLOW);
+      HAL_Delay(500);
+  
+      ST7735_FillScreen(ST7735_WHITE);
+      ST7735_WriteString(0, 0, "WHITE", Font_16x26, ST7735_BLACK, ST7735_WHITE);
+      HAL_Delay(500);
 
 
   /* USER CODE END 2 */
@@ -138,7 +177,6 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-
 
     /* USER CODE END WHILE */
 

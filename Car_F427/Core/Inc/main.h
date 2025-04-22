@@ -57,6 +57,12 @@ void Error_Handler(void);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
+#define LCD_RESET_Pin GPIO_PIN_4
+#define LCD_RESET_GPIO_Port GPIOA
+#define LCD_DC_Pin GPIO_PIN_4
+#define LCD_DC_GPIO_Port GPIOC
+#define LCD_CS_Pin GPIO_PIN_5
+#define LCD_CS_GPIO_Port GPIOC
 #define LED_B_Pin GPIO_PIN_15
 #define LED_B_GPIO_Port GPIOD
 #define LED_G_Pin GPIO_PIN_15
@@ -65,6 +71,8 @@ void Error_Handler(void);
 #define LED_R_GPIO_Port GPIOB
 
 /* USER CODE BEGIN Private defines */
+extern uint8_t RcUartBuffer[25]; // 正确声明
+extern DMA_HandleTypeDef hdma_usart1_rx;
 
 /* USER CODE END Private defines */
 

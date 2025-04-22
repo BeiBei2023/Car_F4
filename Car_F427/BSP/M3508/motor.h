@@ -62,7 +62,7 @@ extern MotorRxData_t motor_data[CAN_MOTOR_NUM]; // 存放实时的电机数据
 
 void related_initialization_of_motors(CAN_HandleTypeDef *hcan, CAN_Call_Back Callback_Function);
 void set_motor_target_speed(int16_t new_target_speed[CAN_MOTOR_NUM]);
-void motor_pid_update(void);
+//void motor_pid_update(void);
 uint8_t send_motor_speed_commands(CAN_HandleTypeDef *hcan,
                                   int16_t motor1_speed,
                                   int16_t motor2_speed,

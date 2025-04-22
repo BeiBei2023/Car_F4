@@ -34,6 +34,12 @@
                     "path": "../Core/Src/gpio.c"
                   },
                   {
+                    "path": "../Core/Src/freertos.c"
+                  },
+                  {
+                    "path": "../Core/Src/can.c"
+                  },
+                  {
                     "path": "../Core/Src/dma.c"
                   },
                   {
@@ -44,6 +50,9 @@
                   },
                   {
                     "path": "../Core/Src/stm32f4xx_hal_msp.c"
+                  },
+                  {
+                    "path": "../Core/Src/stm32f4xx_hal_timebase_tim.c"
                   }
                 ],
                 "folders": []
@@ -60,7 +69,13 @@
             "name": "STM32F4xx_HAL_Driver",
             "files": [
               {
-                "path": "../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_uart.c"
+                "path": "../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_tim.c"
+              },
+              {
+                "path": "../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_tim_ex.c"
+              },
+              {
+                "path": "../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_can.c"
               },
               {
                 "path": "../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_rcc.c"
@@ -100,6 +115,9 @@
               },
               {
                 "path": "../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_exti.c"
+              },
+              {
+                "path": "../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_uart.c"
               }
             ],
             "folders": []
@@ -109,6 +127,48 @@
             "files": [
               {
                 "path": "../Core/Src/system_stm32f4xx.c"
+              }
+            ],
+            "folders": []
+          }
+        ]
+      },
+      {
+        "name": "Middlewares",
+        "files": [],
+        "folders": [
+          {
+            "name": "FreeRTOS",
+            "files": [
+              {
+                "path": "../Middlewares/Third_Party/FreeRTOS/Source/croutine.c"
+              },
+              {
+                "path": "../Middlewares/Third_Party/FreeRTOS/Source/event_groups.c"
+              },
+              {
+                "path": "../Middlewares/Third_Party/FreeRTOS/Source/list.c"
+              },
+              {
+                "path": "../Middlewares/Third_Party/FreeRTOS/Source/queue.c"
+              },
+              {
+                "path": "../Middlewares/Third_Party/FreeRTOS/Source/stream_buffer.c"
+              },
+              {
+                "path": "../Middlewares/Third_Party/FreeRTOS/Source/tasks.c"
+              },
+              {
+                "path": "../Middlewares/Third_Party/FreeRTOS/Source/timers.c"
+              },
+              {
+                "path": "../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os2.c"
+              },
+              {
+                "path": "../Middlewares/Third_Party/FreeRTOS/Source/portable/MemMang/heap_4.c"
+              },
+              {
+                "path": "../Middlewares/Third_Party/FreeRTOS/Source/portable/RVDS/ARM_CM4F/port.c"
               }
             ],
             "folders": []
@@ -133,6 +193,54 @@
             "files": [
               {
                 "path": "../BSP/LOG/log.c"
+              }
+            ],
+            "folders": []
+          },
+          {
+            "name": "M3508",
+            "files": [
+              {
+                "path": "../BSP/M3508/drv_can.c"
+              },
+              {
+                "path": "../BSP/M3508/motor.c"
+              }
+            ],
+            "folders": []
+          },
+          {
+            "name": "PID",
+            "files": [
+              {
+                "path": "../BSP/PID/pid.c"
+              }
+            ],
+            "folders": []
+          },
+          {
+            "name": "TASK",
+            "files": [
+              {
+                "path": "../BSP/TASKS/callback.c"
+              },
+              {
+                "path": "../BSP/TASKS/motor_control.c"
+              },
+              {
+                "path": "../BSP/TASKS/send_motor_data.c"
+              },
+              {
+                "path": "../BSP/TASKS/sever_init.c"
+              }
+            ],
+            "folders": []
+          },
+          {
+            "name": "WHEEL",
+            "files": [
+              {
+                "path": "../BSP/WHEEL/wheel.c"
               }
             ],
             "folders": []
@@ -290,10 +398,16 @@
           "../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy",
           "../Drivers/CMSIS/Device/ST/STM32F4xx/Include",
           "../Drivers/CMSIS/Include",
+          "../Middlewares/Third_Party/FreeRTOS/Source/include",
+          "../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2",
+          "../Middlewares/Third_Party/FreeRTOS/Source/portable/RVDS/ARM_CM4F",
           "../BSP",
           "../BSP/SBUS",
           "../BSP/LOG",
-          ".cmsis/include",
+          "../BSP/M3508",
+          "../BSP/PID",
+          "../BSP/TASKS",
+          "../BSP/WHEEL",
           "RTE/_Car_F427"
         ],
         "libList": [],

@@ -8,6 +8,8 @@ void init(void)
 
     related_initialization_of_motors(motor_can, CAN_Motor_Call_Back); // 初始化电机
 
+
+
     /*-----------------------------------------------------------------*/
 
     /*-------------------------初始化PID参数---------------------------- */
@@ -40,5 +42,9 @@ void init(void)
                     M3508_MOTOR_4_POSSITION_PID_KI,
                     M3508_MOTOR_4_POSSITION_PID_KD);
     /*-----------------------------------------------------------------------*/
+
+
+
+
     EMLOG(LOG_INFO, "init ok");
 }

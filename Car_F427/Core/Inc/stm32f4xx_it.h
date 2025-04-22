@@ -27,6 +27,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+// 在头文件中，避免直接定义
 
 /* USER CODE END Includes */
 

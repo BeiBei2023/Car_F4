@@ -43,6 +43,9 @@
                     "path": "../Core/Src/dma.c"
                   },
                   {
+                    "path": "../Core/Src/spi.c"
+                  },
+                  {
                     "path": "../Core/Src/usart.c"
                   },
                   {
@@ -115,6 +118,9 @@
               },
               {
                 "path": "../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_exti.c"
+              },
+              {
+                "path": "../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_spi.c"
               },
               {
                 "path": "../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_uart.c"
@@ -241,6 +247,18 @@
             "files": [
               {
                 "path": "../BSP/WHEEL/wheel.c"
+              }
+            ],
+            "folders": []
+          },
+          {
+            "name": "ST7735S",
+            "files": [
+              {
+                "path": "../BSP/ST7735S/st7735s.c"
+              },
+              {
+                "path": "../BSP/ST7735S/fonts.c"
               }
             ],
             "folders": []
@@ -421,6 +439,7 @@
           "../BSP/PID",
           "../BSP/TASKS",
           "../BSP/WHEEL",
+          "../BSP/ST7735S",
           "../MDK-ARM/RTE/_Car_F427"
         ],
         "libList": [],

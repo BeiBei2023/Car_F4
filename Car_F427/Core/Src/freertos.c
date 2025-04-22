@@ -59,7 +59,7 @@ osThreadId_t MotorTaskHandle;
 const osThreadAttr_t MotorTask_attributes = {
   .name = "MotorTask",
   .stack_size = 1024 * 4,
-  .priority = (osPriority_t) osPriorityBelowNormal,
+  .priority = (osPriority_t) osPriorityRealtime,
 };
 /* Definitions for MotorDataTask */
 osThreadId_t MotorDataTaskHandle;
@@ -72,8 +72,8 @@ const osThreadAttr_t MotorDataTask_attributes = {
 osThreadId_t Task_RemoteHandle;
 const osThreadAttr_t Task_Remote_attributes = {
   .name = "Task_Remote",
-  .stack_size = 128 * 4,
-  .priority = (osPriority_t) osPriorityNormal,
+  .stack_size = 1024 * 4,
+  .priority = (osPriority_t) osPriorityHigh7,
 };
 /* Definitions for Task_LED */
 osThreadId_t Task_LEDHandle;
