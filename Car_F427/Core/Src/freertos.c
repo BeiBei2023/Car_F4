@@ -80,7 +80,7 @@ osThreadId_t Task_LEDHandle;
 const osThreadAttr_t Task_LED_attributes = {
   .name = "Task_LED",
   .stack_size = 1024 * 4,
-  .priority = (osPriority_t) osPriorityLow,
+  .priority = (osPriority_t) osPriorityNormal,
 };
 /* Definitions for mutex */
 osMutexId_t mutexHandle;

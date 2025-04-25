@@ -1,9 +1,14 @@
 {
-    "folders": [
-        {
-            "path": "."
-        }
-    ],
-    "settings": {},
-    "extensions": {}
+  "folders": [
+    {
+      "path": "."
+    }
+  ],
+  "settings": {
+    "files.associations": {
+      "screen_manager.h": "c",
+      "stdint.h": "c"
+    }
+  },
+  "extensions": {}
 }

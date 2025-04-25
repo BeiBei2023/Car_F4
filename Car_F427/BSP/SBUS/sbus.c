@@ -31,8 +31,8 @@ void sbus_decode_frame(uint8_t *buf)
         sbus_ch_data.channels[13] = sbus_value_convert((((buf[18] >> 7) | (buf[19] << 1)) | (buf[20] << 9)) & 0x07FF);
         sbus_ch_data.channels[14] = sbus_value_convert((((buf[20] >> 2) | (buf[21] << 6)) & 0x07FF));
         sbus_ch_data.channels[15] = sbus_value_convert((((buf[21] >> 5) | (buf[22] << 3)) & 0x07FF));
-        
-        sbus_ch_data.flags = buf[23];   
+
+        sbus_ch_data.flags = buf[23];
     }
 }
 

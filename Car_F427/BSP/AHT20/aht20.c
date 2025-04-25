@@ -40,3 +40,5 @@ void AHT20_Read(AHT20_Data_t *data)
     data->Temperature = dataTemperature * 200.0f / (1 << 20) - 50;
   }
 }
+
+

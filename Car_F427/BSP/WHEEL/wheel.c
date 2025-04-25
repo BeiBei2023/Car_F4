@@ -3,6 +3,8 @@
 #include "aht20.h"
 #include "adc_v.h"
 
+#include "screen_config.h"
+
 RobotState g_robot;
 /*
 由于45°的角度关系，我们可以很轻易地通过轮子的转速来计算出辊子的速度，当然反之亦然。
@@ -89,27 +91,55 @@ void task_remote_attr(void *argument)
 void task_led_attr(void *argument)
 {
     AHT20_Data_t sensorData;
+    // gt_examples_button();
     for (;;)
     {
-       
+        // ST7735_DrawImage(0, 0, 160, 80, gImage_dianya);
+
         AHT20_Read(&sensorData);
-        
-      
-        char tempStr[32];
-        char humStr[32];
-        char adcStr[32];
-      
-        sprintf(tempStr, "Temp: %.2f C", sensorData.Temperature);
-        sprintf(humStr, "Hum: %.2f %%", sensorData.Humidity);
-        sprintf(adcStr, "ADC: %.2f V",adc_v.v_in );
-      
-        ST7735_FillScreen(ST7735_BLACK); // 清屏
-        ST7735_WriteString(0, 0, tempStr, Font_7x10, ST7735_WHITE, ST7735_BLACK);
-        ST7735_WriteString(0, 15, humStr, Font_7x10, ST7735_WHITE, ST7735_BLACK);
-        ST7735_WriteString(0, 30, adcStr, Font_7x10, ST7735_WHITE, ST7735_BLACK);
-      
-        HAL_GPIO_TogglePin(LED_B_GPIO_Port,LED_B_Pin);
-        
-        vTaskDelay(pdMS_TO_TICKS(1000)); // 200ms检测周期
+
+        // char tempStr[32];
+        // char humStr[32];
+        // char adcStr[32];
+
+        // sprintf(tempStr, "Temp: %.2f C", sensorData.Temperature);
+        // sprintf(humStr, "Hum: %.2f %%", sensorData.Humidity);
+        // sprintf(adcStr, "%.2f",adc_v.v_in );
+
+        // ST7735_FillScreen(ST7735_BLACK); // 清屏
+        // ST7735_WriteString(0, 0, tempStr, Font_7x10, ST7735_WHITE, ST7735_BLACK);
+        // ST7735_WriteString(0, 15, humStr, Font_7x10, ST7735_WHITE, ST7735_BLACK);
+        // ST7735_WriteString(31, 43, adcStr, &Font_16x26, ST7735_BLACK, ST7735_WHITE);
+        for (int i = 0; i < 2; i++)
+        {
+            screen_mgr.current_screen = i;
+           ;
+            // 电压界面更新
+            if (screen_mgr.current_screen == 0)
+            {
+                ScreenManager_Switch(&screen_mgr, 0);
+                char buf[20];
+                snprintf(buf, sizeof(buf), "%.2f", adc_v.v_in);
+                ScreenManager_UpdateRegion(&screen_mgr, 0, buf);
+            }
+            else if (screen_mgr.current_screen == 1)
+            {
+                ScreenManager_Switch(&screen_mgr, 1);
+                float temp = sensorData.Temperature;
+                float humidity = sensorData.Humidity;
+
+                char temp_str[20];
+                snprintf(temp_str, sizeof(temp_str), "%.1f", temp);
+                ScreenManager_UpdateRegion(&screen_mgr, 0, temp_str);
+
+                char hum_str[20];
+                snprintf(hum_str, sizeof(hum_str), "%.1f", humidity);
+                ScreenManager_UpdateRegion(&screen_mgr, 1, hum_str);
+            }
+            vTaskDelay(pdMS_TO_TICKS(2000)); // 200ms检测周期
+        }
+
+        // HAL_GPIO_TogglePin(LED_G_GPIO_Port,LED_G_Pin);
+
     }
 }

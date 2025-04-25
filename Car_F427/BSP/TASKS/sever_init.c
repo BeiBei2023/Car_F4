@@ -48,6 +48,7 @@ void init(void)
 
 
     ST7735_Init();
+    
     AHT20_Init();
 
     EMLOG(LOG_INFO, "init ok");

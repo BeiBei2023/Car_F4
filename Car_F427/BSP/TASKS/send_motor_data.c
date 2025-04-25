@@ -15,10 +15,17 @@ void send_motor_data_task(void *argument)
   
 
 
-        char str_buffer[20];
-        sprintf(str_buffer, "%d", 4566);
+        // char str_buffer[20];
+        // sprintf(str_buffer, "%d", 4566);
        // LCD_ST7735_DrawString(str_buffer, 0, 0, &Font_20x24, ST7735_YELLOW,ST7735_BLUE);
 
         osDelay(20);
     }
+
+
+
+
 }
+
+
+
