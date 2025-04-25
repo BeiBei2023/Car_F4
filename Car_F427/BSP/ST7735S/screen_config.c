@@ -1,6 +1,6 @@
 #include "screen_config.h"
 
-extern FontDef Font_16x26;
+// extern FontDef Font_16x26;
 
 /**** 文字区域配置 ****/
 TextRegion voltage_regions[] = {
