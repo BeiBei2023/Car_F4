@@ -92,135 +92,58 @@ void task_remote_attr(void *argument)
 void task_led_attr(void *argument)
 {
     AHT20_Data_t sensorData;
-    // gt_examples_button();
+    char buf[20]; // 复用缓冲区
+    
+    // 用枚举替代魔数,要根据屏幕顺序来排列
+    typedef enum {
+        SCREEN_DEFAULT  = 0,
+        SCREEN_VOLTAGE  = 1,
+        SCREEN_TEMP_HUM = 2,
+        SCREEN_GITHUB  = 3,
+        SCREEN_MOTOR    = 4
+    } ScreenState;
+
     for (;;)
     {
-        // ST7735_DrawImage(0, 0, 160, 80, gImage_dianya);
-
-        AHT20_Read(&sensorData);
-
-        // char tempStr[32];
-        // char humStr[32];
-        // char adcStr[32];
-
-        // sprintf(tempStr, "Temp: %.2f C", sensorData.Temperature);
-        // sprintf(humStr, "Hum: %.2f %%", sensorData.Humidity);
-        // sprintf(adcStr, "%.2f",adc_v.v_in );
-
-        // ST7735_FillScreen(ST7735_BLACK); // 清屏
-        // ST7735_WriteString(0, 0, tempStr, Font_7x10, ST7735_WHITE, ST7735_BLACK);
-        // ST7735_WriteString(0, 15, humStr, Font_7x10, ST7735_WHITE, ST7735_BLACK);
-        // ST7735_WriteString(31, 43, adcStr, &Font_16x26, ST7735_BLACK, ST7735_WHITE);
-        // for (int i = 0; i < 3; i++)
-        // {
-        //     screen_mgr.current_screen = i;
-        //     ;
-        //     // 电压界面更新
-        //     if (screen_mgr.current_screen == 0)
-        //     {
-        //         ScreenManager_Switch(&screen_mgr, 0);
-        //         char buf[20];
-        //         snprintf(buf, sizeof(buf), "%.2f", adc_v.v_in);
-        //         ScreenManager_UpdateRegion(&screen_mgr, 0, buf);
-        //     }
-        //     else if (screen_mgr.current_screen == 1)
-        //     {
-        //         ScreenManager_Switch(&screen_mgr, 1);
-        //         float temp = sensorData.Temperature;
-        //         float humidity = sensorData.Humidity;
-
-        //         char temp_str[20];
-        //         snprintf(temp_str, sizeof(temp_str), "%.1f", temp);
-        //         ScreenManager_UpdateRegion(&screen_mgr, 0, temp_str);
-
-        //         char hum_str[20];
-        //         snprintf(hum_str, sizeof(hum_str), "%.1f", humidity);
-        //         ScreenManager_UpdateRegion(&screen_mgr, 1, hum_str);
-        //     }
-        //     else if (screen_mgr.current_screen == 2)
-        //     {
-        //         ScreenManager_Switch(&screen_mgr, 2);
-        //     }
-        //     vTaskDelay(pdMS_TO_TICKS(2000)); // 200ms检测周期
-        // }
-
-        if (but_cnt.button_count == 1)
+        ScreenState current_screen = but_cnt.button_count;
+        
+        // 统一处理屏幕切换和标志位清零
+        if (but_cnt.button_flage == 1) 
         {
-            HAL_GPIO_WritePin(LED_R_GPIO_Port, LED_R_Pin, GPIO_PIN_RESET);
-            if (but_cnt.button_flage == 1)
-            {
-                ScreenManager_Switch(&screen_mgr, 1);
-                but_cnt.button_flage = 0;
-            }
-
-            char buf[20];
-            snprintf(buf, sizeof(buf), "%.2f", adc_v.v_in);
-            ScreenManager_UpdateRegion(&screen_mgr, 0, buf);
-        }
-        else if (but_cnt.button_count == 2)
-        {
-            if (but_cnt.button_flage == 1)
-            {
-
-                ScreenManager_Switch(&screen_mgr, 2);
-                but_cnt.button_flage = 0;
-            }
-            float temp = sensorData.Temperature;
-            float humidity = sensorData.Humidity;
-
-            char temp_str[20];
-            snprintf(temp_str, sizeof(temp_str), "%.1f", temp);
-            ScreenManager_UpdateRegion(&screen_mgr, 0, temp_str);
-
-            char hum_str[20];
-            snprintf(hum_str, sizeof(hum_str), "%.1f", humidity);
-            ScreenManager_UpdateRegion(&screen_mgr, 1, hum_str);
-        }
-        else if (but_cnt.button_count == 3)
-        {
-            if (but_cnt.button_flage == 1)
-            {
-
-                ScreenManager_Switch(&screen_mgr, 3);
-                but_cnt.button_flage = 0;
-            }
-        }
-        else if (but_cnt.button_count == 4 || but_cnt.button_count == 0)
-        {
-            // HAL_GPIO_WritePin(LED_R_GPIO_Port,LED_R_Pin,GPIO_PIN_SET);
-            // ScreenManager_Switch(&screen_mgr, 0);
-            if (but_cnt.button_flage == 1)
-            {
-
-                ScreenManager_Switch(&screen_mgr, 0);
-                but_cnt.button_flage = 0;
-            }
-        }
-        else if (but_cnt.button_count == 5)
-        {
-
-            if (but_cnt.button_flage == 1)
-            {
-
-                ScreenManager_Switch(&screen_mgr, 4);
-                but_cnt.button_flage = 0;
-            }
-
-            char speed_str[20];
-            snprintf(speed_str, sizeof(speed_str), "%d", 4444);
-            ScreenManager_UpdateRegion(&screen_mgr, 0, speed_str);
-            // char speed_str[20];
-            snprintf(speed_str, sizeof(speed_str), "%d", 4566);
-            ScreenManager_UpdateRegion(&screen_mgr, 1, speed_str);
-            // char speed_str[20];
-            snprintf(speed_str, sizeof(speed_str), "%d", 4646);
-            ScreenManager_UpdateRegion(&screen_mgr, 2, speed_str);
-            // char speed_str[20];
-            snprintf(speed_str, sizeof(speed_str), "%d", 2256);
-            ScreenManager_UpdateRegion(&screen_mgr, 3, speed_str);
+            ScreenManager_Switch(&screen_mgr, current_screen);
+            but_cnt.button_flage = 0;
         }
 
-        vTaskDelay(pdMS_TO_TICKS(2)); // 200ms检测周期
-        //  HAL_GPIO_TogglePin(LED_G_GPIO_Port,LED_G_Pin);
+        // 根据当前屏幕更新内容
+        switch(current_screen)
+        {
+            case SCREEN_VOLTAGE:  // 电压屏
+                HAL_GPIO_WritePin(LED_R_GPIO_Port, LED_R_Pin, GPIO_PIN_RESET);
+                snprintf(buf, sizeof(buf), "%.2f", adc_v.v_in);
+                ScreenManager_UpdateRegion(&screen_mgr, 0, buf);
+                break;
+
+            case SCREEN_TEMP_HUM: // 温湿度屏
+                AHT20_Read(&sensorData);
+                snprintf(buf, sizeof(buf), "%.1f", sensorData.Temperature);
+                ScreenManager_UpdateRegion(&screen_mgr, 0, buf);
+                snprintf(buf, sizeof(buf), "%.1f", sensorData.Humidity);
+                ScreenManager_UpdateRegion(&screen_mgr, 1, buf);
+                break;
+
+            case SCREEN_MOTOR:    // 电机屏
+                for(int i=0; i<4; i++) {
+                    snprintf(buf, sizeof(buf), "%d", motor_data[i].motor_omega);
+                    ScreenManager_UpdateRegion(&screen_mgr, i, buf);
+                }
+                break;
+
+
+            default: // SCREEN_DEFAULT及其他
+                // HAL_GPIO_WritePin(LED_R_GPIO_Port,LED_R_Pin,GPIO_PIN_SET);
+                break;
+        }
+
+        vTaskDelay(pdMS_TO_TICKS(200)); // 修正为200ms延时
     }
 }
