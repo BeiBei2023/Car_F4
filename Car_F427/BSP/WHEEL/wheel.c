@@ -2,8 +2,9 @@
 #include "st7735s.h"
 #include "aht20.h"
 #include "adc_v.h"
-
+#include "button_config.h"
 #include "screen_config.h"
+#include "motor.h"
 
 RobotState g_robot;
 /*
@@ -110,36 +111,89 @@ void task_led_attr(void *argument)
         // ST7735_WriteString(0, 0, tempStr, Font_7x10, ST7735_WHITE, ST7735_BLACK);
         // ST7735_WriteString(0, 15, humStr, Font_7x10, ST7735_WHITE, ST7735_BLACK);
         // ST7735_WriteString(31, 43, adcStr, &Font_16x26, ST7735_BLACK, ST7735_WHITE);
-        for (int i = 0; i < 2; i++)
+        // for (int i = 0; i < 3; i++)
+        // {
+        //     screen_mgr.current_screen = i;
+        //     ;
+        //     // 电压界面更新
+        //     if (screen_mgr.current_screen == 0)
+        //     {
+        //         ScreenManager_Switch(&screen_mgr, 0);
+        //         char buf[20];
+        //         snprintf(buf, sizeof(buf), "%.2f", adc_v.v_in);
+        //         ScreenManager_UpdateRegion(&screen_mgr, 0, buf);
+        //     }
+        //     else if (screen_mgr.current_screen == 1)
+        //     {
+        //         ScreenManager_Switch(&screen_mgr, 1);
+        //         float temp = sensorData.Temperature;
+        //         float humidity = sensorData.Humidity;
+
+        //         char temp_str[20];
+        //         snprintf(temp_str, sizeof(temp_str), "%.1f", temp);
+        //         ScreenManager_UpdateRegion(&screen_mgr, 0, temp_str);
+
+        //         char hum_str[20];
+        //         snprintf(hum_str, sizeof(hum_str), "%.1f", humidity);
+        //         ScreenManager_UpdateRegion(&screen_mgr, 1, hum_str);
+        //     }
+        //     else if (screen_mgr.current_screen == 2)
+        //     {
+        //         ScreenManager_Switch(&screen_mgr, 2);
+        //     }
+        //     vTaskDelay(pdMS_TO_TICKS(2000)); // 200ms检测周期
+        // }
+
+        if (but_cnt.button_count == 1)
         {
-            screen_mgr.current_screen = i;
-           ;
-            // 电压界面更新
-            if (screen_mgr.current_screen == 0)
-            {
-                ScreenManager_Switch(&screen_mgr, 0);
-                char buf[20];
-                snprintf(buf, sizeof(buf), "%.2f", adc_v.v_in);
-                ScreenManager_UpdateRegion(&screen_mgr, 0, buf);
-            }
-            else if (screen_mgr.current_screen == 1)
-            {
-                ScreenManager_Switch(&screen_mgr, 1);
-                float temp = sensorData.Temperature;
-                float humidity = sensorData.Humidity;
+            HAL_GPIO_WritePin(LED_R_GPIO_Port,LED_R_Pin,GPIO_PIN_RESET);
+            ScreenManager_Switch(&screen_mgr, 1);
+            char buf[20];
+            snprintf(buf, sizeof(buf), "%.2f", adc_v.v_in);
+            ScreenManager_UpdateRegion(&screen_mgr, 0, buf);
+        }else if (but_cnt.button_count == 2)
+        {
+            ScreenManager_Switch(&screen_mgr, 2);
+            float temp = sensorData.Temperature;
+            float humidity = sensorData.Humidity;
 
-                char temp_str[20];
-                snprintf(temp_str, sizeof(temp_str), "%.1f", temp);
-                ScreenManager_UpdateRegion(&screen_mgr, 0, temp_str);
+            char temp_str[20];
+            snprintf(temp_str, sizeof(temp_str), "%.1f", temp);
+            ScreenManager_UpdateRegion(&screen_mgr, 0, temp_str);
 
-                char hum_str[20];
-                snprintf(hum_str, sizeof(hum_str), "%.1f", humidity);
-                ScreenManager_UpdateRegion(&screen_mgr, 1, hum_str);
-            }
-            vTaskDelay(pdMS_TO_TICKS(2000)); // 200ms检测周期
+            char hum_str[20];
+            snprintf(hum_str, sizeof(hum_str), "%.1f", humidity);
+            ScreenManager_UpdateRegion(&screen_mgr, 1, hum_str);
+        }else if (but_cnt.button_count == 3)
+        {
+            ScreenManager_Switch(&screen_mgr, 3);
+
+        }else if ( but_cnt.button_count == 4    || but_cnt.button_count == 0)
+        {
+            HAL_GPIO_WritePin(LED_R_GPIO_Port,LED_R_Pin,GPIO_PIN_SET);
+            ScreenManager_Switch(&screen_mgr, 0);
+            
+        }else if ( but_cnt.button_count == 5)
+        {
+            ScreenManager_Switch(&screen_mgr, 4);
+
+
+            char speed_str[20];
+            snprintf(speed_str, sizeof(speed_str), "%d",4444);
+            ScreenManager_UpdateRegion(&screen_mgr, 0, speed_str);
+            //char speed_str[20];
+            snprintf(speed_str, sizeof(speed_str), "%d",4566);
+            ScreenManager_UpdateRegion(&screen_mgr, 1, speed_str);
+            //char speed_str[20];
+            snprintf(speed_str, sizeof(speed_str), "%d",4646);
+            ScreenManager_UpdateRegion(&screen_mgr, 2, speed_str);
+           // char speed_str[20];
+            snprintf(speed_str, sizeof(speed_str), "%d",2256);
+            ScreenManager_UpdateRegion(&screen_mgr, 3, speed_str);
         }
+        
 
-        // HAL_GPIO_TogglePin(LED_G_GPIO_Port,LED_G_Pin);
-
+        vTaskDelay(pdMS_TO_TICKS(2)); // 200ms检测周期
+        //  HAL_GPIO_TogglePin(LED_G_GPIO_Port,LED_G_Pin);
     }
 }

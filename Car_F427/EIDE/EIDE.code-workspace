@@ -6,8 +6,7 @@
   ],
   "settings": {
     "files.associations": {
-      "screen_manager.h": "c",
-      "stdint.h": "c"
+      "screen_config.h": "c"
     }
   },
   "extensions": {}

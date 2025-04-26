@@ -47,6 +47,7 @@
      for(int i=0; i<screen->region_count; i++){
          memset(screen->regions[i].old_str, 0, sizeof(screen->regions[i].old_str));
      }
+
      
      // 更新屏幕管理器的当前屏幕ID
      mgr->current_screen = screen_id;

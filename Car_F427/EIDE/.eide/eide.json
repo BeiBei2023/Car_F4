@@ -313,6 +313,18 @@
               }
             ],
             "folders": []
+          },
+          {
+            "name": "BUTTON",
+            "files": [
+              {
+                "path": "../BSP/BUTTON/multi_button.c"
+              },
+              {
+                "path": "../BSP/BUTTON/button_config.c"
+              }
+            ],
+            "folders": []
           }
         ]
       },
@@ -493,6 +505,7 @@
           "../BSP/ST7735S",
           "../BSP/AHT20",
           "../BSP/ADC",
+          "../BSP/BUTTON",
           "../MDK-ARM/RTE/_Car_F427"
         ],
         "libList": [],

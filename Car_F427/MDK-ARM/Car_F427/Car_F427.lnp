@@ -64,6 +64,8 @@
 "car_f427\screen_config.o"
 "car_f427\aht20.o"
 "car_f427\adc_v.o"
+"car_f427\multi_button.o"
+"car_f427\button_config.o"
 --strict --scatter "Car_F427\Car_F427.sct"
 --summary_stderr --info summarysizes --map --load_addr_map_info --xref --callgraph --symbols
 --info sizes --info totals --info unused --info veneers
