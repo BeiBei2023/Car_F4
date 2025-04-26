@@ -146,14 +146,25 @@ void task_led_attr(void *argument)
 
         if (but_cnt.button_count == 1)
         {
-            HAL_GPIO_WritePin(LED_R_GPIO_Port,LED_R_Pin,GPIO_PIN_RESET);
-            ScreenManager_Switch(&screen_mgr, 1);
+            HAL_GPIO_WritePin(LED_R_GPIO_Port, LED_R_Pin, GPIO_PIN_RESET);
+            if (but_cnt.button_flage == 1)
+            {
+                ScreenManager_Switch(&screen_mgr, 1);
+                but_cnt.button_flage = 0;
+            }
+
             char buf[20];
             snprintf(buf, sizeof(buf), "%.2f", adc_v.v_in);
             ScreenManager_UpdateRegion(&screen_mgr, 0, buf);
-        }else if (but_cnt.button_count == 2)
+        }
+        else if (but_cnt.button_count == 2)
         {
-            ScreenManager_Switch(&screen_mgr, 2);
+            if (but_cnt.button_flage == 1)
+            {
+
+                ScreenManager_Switch(&screen_mgr, 2);
+                but_cnt.button_flage = 0;
+            }
             float temp = sensorData.Temperature;
             float humidity = sensorData.Humidity;
 
@@ -164,34 +175,50 @@ void task_led_attr(void *argument)
             char hum_str[20];
             snprintf(hum_str, sizeof(hum_str), "%.1f", humidity);
             ScreenManager_UpdateRegion(&screen_mgr, 1, hum_str);
-        }else if (but_cnt.button_count == 3)
+        }
+        else if (but_cnt.button_count == 3)
         {
-            ScreenManager_Switch(&screen_mgr, 3);
+            if (but_cnt.button_flage == 1)
+            {
 
-        }else if ( but_cnt.button_count == 4    || but_cnt.button_count == 0)
+                ScreenManager_Switch(&screen_mgr, 3);
+                but_cnt.button_flage = 0;
+            }
+        }
+        else if (but_cnt.button_count == 4 || but_cnt.button_count == 0)
         {
-            HAL_GPIO_WritePin(LED_R_GPIO_Port,LED_R_Pin,GPIO_PIN_SET);
-            ScreenManager_Switch(&screen_mgr, 0);
-            
-        }else if ( but_cnt.button_count == 5)
-        {
-            ScreenManager_Switch(&screen_mgr, 4);
+            // HAL_GPIO_WritePin(LED_R_GPIO_Port,LED_R_Pin,GPIO_PIN_SET);
+            // ScreenManager_Switch(&screen_mgr, 0);
+            if (but_cnt.button_flage == 1)
+            {
 
+                ScreenManager_Switch(&screen_mgr, 0);
+                but_cnt.button_flage = 0;
+            }
+        }
+        else if (but_cnt.button_count == 5)
+        {
+
+            if (but_cnt.button_flage == 1)
+            {
+
+                ScreenManager_Switch(&screen_mgr, 4);
+                but_cnt.button_flage = 0;
+            }
 
             char speed_str[20];
-            snprintf(speed_str, sizeof(speed_str), "%d",4444);
+            snprintf(speed_str, sizeof(speed_str), "%d", 4444);
             ScreenManager_UpdateRegion(&screen_mgr, 0, speed_str);
-            //char speed_str[20];
-            snprintf(speed_str, sizeof(speed_str), "%d",4566);
+            // char speed_str[20];
+            snprintf(speed_str, sizeof(speed_str), "%d", 4566);
             ScreenManager_UpdateRegion(&screen_mgr, 1, speed_str);
-            //char speed_str[20];
-            snprintf(speed_str, sizeof(speed_str), "%d",4646);
+            // char speed_str[20];
+            snprintf(speed_str, sizeof(speed_str), "%d", 4646);
             ScreenManager_UpdateRegion(&screen_mgr, 2, speed_str);
-           // char speed_str[20];
-            snprintf(speed_str, sizeof(speed_str), "%d",2256);
+            // char speed_str[20];
+            snprintf(speed_str, sizeof(speed_str), "%d", 2256);
             ScreenManager_UpdateRegion(&screen_mgr, 3, speed_str);
         }
-        
 
         vTaskDelay(pdMS_TO_TICKS(2)); // 200ms检测周期
         //  HAL_GPIO_TogglePin(LED_G_GPIO_Port,LED_G_Pin);

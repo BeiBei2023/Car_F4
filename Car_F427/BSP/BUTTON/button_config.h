@@ -10,6 +10,7 @@
 typedef struct
 {
     uint8_t button_count;
+    uint8_t button_flage;
 } button_get;
 
 extern button_get but_cnt ;

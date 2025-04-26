@@ -13,10 +13,10 @@ TextRegion temp_regions[] = {
 };
 
 TextRegion motor_speed[] = {
-    {29, 6, &Font_11x18, ST7735_BLACK, ST7735_WHITE, ""},   // 温度
-    {107, 6, &Font_11x18, ST7735_BLACK, ST7735_WHITE, ""},  // 温度
-    {29, 54, &Font_11x18, ST7735_BLACK, ST7735_WHITE, ""},  // 温度
-    {107, 54, &Font_11x18, ST7735_BLACK, ST7735_WHITE, ""}, // 温度
+    {33, 6, &Font_11x18, ST7735_BLACK, ST7735_WHITE, ""},   // 温度
+    {110, 6, &Font_11x18, ST7735_BLACK, ST7735_WHITE, ""},  // 温度
+    {33, 54, &Font_11x18, ST7735_BLACK, ST7735_WHITE, ""},  // 温度
+    {110, 54, &Font_11x18, ST7735_BLACK, ST7735_WHITE, ""}, // 温度
 };
 
 /**** 界面配置 ****/

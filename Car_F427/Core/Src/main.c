@@ -37,7 +37,6 @@
 #include "screen_config.h"
 #include "button_config.h"
 
-
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -71,6 +70,8 @@ void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t Size)
     __HAL_DMA_DISABLE_IT(&hdma_usart1_rx, DMA_IT_HT);
   }
 }
+
+
 
 /* USER CODE END PV */
 
@@ -133,8 +134,6 @@ int main(void)
   HAL_ADC_Start_IT(&hadc1); // 开始ADC转换
 
   init(); // 初始化电机和PID
-
-
 
   /* USER CODE END 2 */
 
@@ -237,7 +236,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
   if (htim->Instance == TIM9)
   {
     button_ticks();
-    //HAL_GPIO_TogglePin(LED_R_GPIO_Port, LED_R_Pin);
+    // HAL_GPIO_TogglePin(LED_R_GPIO_Port, LED_R_Pin);
   }
 
   /* USER CODE END Callback 1 */

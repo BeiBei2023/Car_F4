@@ -1,13 +1,9 @@
 {
-  "folders": [
-    {
-      "path": "."
-    }
-  ],
-  "settings": {
-    "files.associations": {
-      "screen_config.h": "c"
-    }
-  },
-  "extensions": {}
+    "folders": [
+        {
+            "path": "."
+        }
+    ],
+    "settings": {},
+    "extensions": {}
 }

@@ -22,6 +22,7 @@
         {
             // 单击事件处理
             HAL_GPIO_TogglePin(LED_B_GPIO_Port, LED_B_Pin);
+            but_cnt.button_flage = 1;
             if (but_cnt.button_count== 0 || but_cnt.button_count== 4)
             {
                 but_cnt.button_count = 1;
@@ -44,6 +45,7 @@
         {
             // 双击事件处理
             HAL_GPIO_TogglePin(LED_G_GPIO_Port, LED_G_Pin);
+            but_cnt.button_flage = 1;
             if (but_cnt.button_count != 4)
             {
                 but_cnt.button_count = 4;
