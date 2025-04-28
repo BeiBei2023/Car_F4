@@ -200,6 +200,8 @@ void ST7735_Init()
   
   // 初始化完成后，快速填充整个屏幕为黑色，作为初始化完成的标志
   ST7735_FillScreenFast(ST7735_RED);
+
+  HAL_GPIO_WritePin(LCD_BLK_GPIO_Port, LCD_BLK_Pin, GPIO_PIN_SET);
 }
 
 /**

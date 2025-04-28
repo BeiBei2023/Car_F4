@@ -1,9 +1,14 @@
 {
-    "folders": [
-        {
-            "path": "."
-        }
-    ],
-    "settings": {},
-    "extensions": {}
+  "folders": [
+    {
+      "path": "."
+    }
+  ],
+  "settings": {
+    "files.associations": {
+      "st7735s.h": "c",
+      "log.h": "c"
+    }
+  },
+  "extensions": {}
 }

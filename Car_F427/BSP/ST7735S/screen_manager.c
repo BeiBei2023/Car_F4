@@ -75,16 +75,16 @@
      TextRegion *region = &screen->regions[region_id];
      
      // 1. 计算旧文本区域宽度
-    // uint16_t old_width = strlen(region->old_str) * region->font->width;
+    uint16_t old_width = strlen(region->old_str) * region->font->width;
      
-     // 2. 覆盖旧文本
-    //  ST7735_FillRectangleFast(
-    //      region->x,
-    //      region->y,
-    //      old_width,
-    //      region->font->height,
-    //      region->bg_color
-    //  );
+     //2. 覆盖旧文本
+     ST7735_FillRectangleFast(
+         region->x,
+         region->y,
+         old_width,
+         region->font->height,
+         region->bg_color
+     );
      
      // 3. 绘制新文本
      ST7735_WriteString(
@@ -97,7 +97,7 @@
      );
      
      // 4. 更新缓存
-   //  strncpy(region->old_str, new_str, sizeof(region->old_str)-1);
+    strncpy(region->old_str, new_str, sizeof(region->old_str)-1);
  }
  
 

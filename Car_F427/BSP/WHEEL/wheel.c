@@ -45,6 +45,8 @@ void task_remote_attr(void *argument)
         g_robot.vy = ((float)sbus_ch_data.channels[SBUS_CH_VY] - 1500.0f) / 500.0f;
         g_robot.omega = ((float)sbus_ch_data.channels[SBUS_CH_OMEGA] - 1500.0f) / 500.0f;
 
+
+
         /* 速度档位处理 */
         uint16_t gear_value = sbus_ch_data.channels[SBUS_CH_GEAR];
         if (gear_value < 1500)
@@ -56,7 +58,7 @@ void task_remote_attr(void *argument)
 
         /* 调用 Mecanum_Calc */
         const float a_plus_b = MECANUM_A + MECANUM_B;
-        const float rpm_factor = 60.0f / (2 * 3.1415926f * WHEEL_RADIUS) / cosf(180 / 4) * 19;
+        const float rpm_factor = 60.0f / (2 * 3.1415926f * WHEEL_RADIUS) / cosf(180 / 4) ;
 
         float speed_scale = 1.0f, omega_scale = 1.0f;
 

@@ -37,6 +37,8 @@ typedef volatile struct
     int16_t motor_torque;
     int16_t motor_temperture; // 电机温度的单位为:℃
 
+    int16_t motor_omega_original;   // 转子转速值的单位为:RPM
+
     int16_t motor_angle_last; // 转子机械角度值范围:0~ 8191(对应转子机械角度为0~360°)
     int16_t motor_omega_last; // 转子转速值的单位为:RPM
     int16_t motor_torque_last;

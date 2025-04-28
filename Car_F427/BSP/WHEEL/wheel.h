@@ -15,6 +15,7 @@
 #define SBUS_CH_VY       1   // 通道1控制横向速度
 #define SBUS_CH_OMEGA    3   // 通道4控制旋转
 #define SBUS_CH_GEAR     4   // 通道5为三档拨位开关
+#define SBUS_CH_WORK     5     /// 启动,停止
 
 /* 机械参数（单位：米） */
 /*
@@ -36,7 +37,9 @@ typedef struct {
     float vx;           // 归一化后的前后速度 [-1.0, 1.0]
     float vy;           // 归一化后的横向速度
     float omega;        // 归一化后的旋转速度
-    int8_t speed_mode; // 0-低速 1-中速 2-高速  4-失联  3-在线
+    uint8_t work;        //归一化，-1时停止，1启动
+    int8_t speed_mode; // 0-低速 1-中速 2-高速 
+    
     
     /* 电机控制数据 */
     float motor_rpm[4]; // 四个电机的目标转速（RPM）

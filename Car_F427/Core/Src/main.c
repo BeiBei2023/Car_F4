@@ -132,6 +132,8 @@ int main(void)
 
   HAL_TIM_Base_Start_IT(&htim9);
   HAL_ADC_Start_IT(&hadc1); // 开始ADC转换
+  
+
 
   init(); // 初始化电机和PID
 

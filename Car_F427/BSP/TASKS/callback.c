@@ -31,7 +31,8 @@ void CAN_Motor_Call_Back(Struct_CAN_Rx_Buffer *Rx_Buffer)
 
     /* 更新当前接收到的数据 存放在结构体中*/
     motor_data[motor_num].motor_angle = Rx_Data[0] << 8 | Rx_Data[1];
-    motor_data[motor_num].motor_omega = Rx_Data[2] << 8 | Rx_Data[3];
+    motor_data[motor_num].motor_omega_original = Rx_Data[2] << 8 | Rx_Data[3];
+    motor_data[motor_num].motor_omega =(motor_data[motor_num].motor_omega_original / 19);
     motor_data[motor_num].motor_torque = Rx_Data[4] << 8 | Rx_Data[5];
     motor_data[motor_num].motor_temperture = Rx_Data[6];
 
