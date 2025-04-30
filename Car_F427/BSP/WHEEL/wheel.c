@@ -23,7 +23,6 @@ RobotState g_robot;
 6.	根据根据辊子沿辊子轴平行方向速度与轮子的转速的关系，得到轮子转速
 */
 
-// 死区过滤函数
 /*
 将底盘速度期望解算成四个电机的转速期望
 */
@@ -32,6 +31,9 @@ void task_remote_attr(void *argument)
 {
     const uint32_t task_period = 7;                 // 10ms周期（100Hz）
     TickType_t xLastWakeTime = xTaskGetTickCount(); // 记录上次执行时间
+
+    float speed_scale = 1.0f, omega_scale = 1.0f;
+
     g_robot.motor_rpm[0] = 0;
     g_robot.motor_rpm[1] = 0;
     g_robot.motor_rpm[2] = 0;
@@ -45,28 +47,30 @@ void task_remote_attr(void *argument)
         g_robot.vy = ((float)sbus_ch_data.channels[SBUS_CH_VY] - 1500.0f) / 500.0f;
         g_robot.omega = ((float)sbus_ch_data.channels[SBUS_CH_OMEGA] - 1500.0f) / 500.0f;
 
-
-
-        /* 速度档位处理 */
+        /* 速度档位处理 -------------------------------------------------*/
         uint16_t gear_value = sbus_ch_data.channels[SBUS_CH_GEAR];
+
         if (gear_value < 1500)
             g_robot.speed_mode = 0; // 慢速
         else if (gear_value > 1500)
             g_robot.speed_mode = 2; // 快速
         else
             g_robot.speed_mode = 1; // 中速
+        /*****  --------------------------------------------------------- */
 
         /* 调用 Mecanum_Calc */
         const float a_plus_b = MECANUM_A + MECANUM_B;
-        const float rpm_factor = 60.0f / (2 * 3.1415926f * WHEEL_RADIUS) / cosf(180 / 4) ;
-
-        float speed_scale = 1.0f, omega_scale = 1.0f;
+        const float rpm_factor = 60.0f / (2 * 3.1415926f * WHEEL_RADIUS) / cosf(180 / 4);
 
         switch (g_robot.speed_mode)
         {
         case 0: // 低速档
             speed_scale = 0.3f;
             omega_scale = 0.5f;
+            break;
+        case 1: // 中速档
+            speed_scale = 1.0f;
+            omega_scale = 1.0f;
             break;
         case 2: // 高速档
             speed_scale = 1.5f;
@@ -95,55 +99,56 @@ void task_led_attr(void *argument)
 {
     AHT20_Data_t sensorData;
     char buf[20]; // 复用缓冲区
-    
+
     // 用枚举替代魔数,要根据屏幕顺序来排列
-    typedef enum {
-        SCREEN_DEFAULT  = 0,
-        SCREEN_VOLTAGE  = 1,
+    typedef enum
+    {
+        SCREEN_DEFAULT = 0,
+        SCREEN_VOLTAGE = 1,
         SCREEN_TEMP_HUM = 2,
-        SCREEN_GITHUB  = 3,
-        SCREEN_MOTOR    = 4
+        SCREEN_GITHUB = 3,
+        SCREEN_MOTOR = 4
     } ScreenState;
 
     for (;;)
     {
         ScreenState current_screen = but_cnt.button_count;
-        
+
         // 统一处理屏幕切换和标志位清零
-        if (but_cnt.button_flage == 1) 
+        if (but_cnt.button_flage == 1)
         {
             ScreenManager_Switch(&screen_mgr, current_screen);
             but_cnt.button_flage = 0;
         }
 
         // 根据当前屏幕更新内容
-        switch(current_screen)
+        switch (current_screen)
         {
-            case SCREEN_VOLTAGE:  // 电压屏
-                HAL_GPIO_WritePin(LED_R_GPIO_Port, LED_R_Pin, GPIO_PIN_RESET);
-                snprintf(buf, sizeof(buf), "%.2f", adc_v.v_in);
-                ScreenManager_UpdateRegion(&screen_mgr, 0, buf);
-                break;
+        case SCREEN_VOLTAGE: // 电压屏
+            HAL_GPIO_WritePin(LED_R_GPIO_Port, LED_R_Pin, GPIO_PIN_RESET);
+            snprintf(buf, sizeof(buf), "%.2f", adc_v.v_in);
+            ScreenManager_UpdateRegion(&screen_mgr, 0, buf);
+            break;
 
-            case SCREEN_TEMP_HUM: // 温湿度屏
-                AHT20_Read(&sensorData);
-                snprintf(buf, sizeof(buf), "%.1f", sensorData.Temperature);
-                ScreenManager_UpdateRegion(&screen_mgr, 0, buf);
-                snprintf(buf, sizeof(buf), "%.1f", sensorData.Humidity);
-                ScreenManager_UpdateRegion(&screen_mgr, 1, buf);
-                break;
+        case SCREEN_TEMP_HUM: // 温湿度屏
+            AHT20_Read(&sensorData);
+            snprintf(buf, sizeof(buf), "%.1f", sensorData.Temperature);
+            ScreenManager_UpdateRegion(&screen_mgr, 0, buf);
+            snprintf(buf, sizeof(buf), "%.1f", sensorData.Humidity);
+            ScreenManager_UpdateRegion(&screen_mgr, 1, buf);
+            break;
 
-            case SCREEN_MOTOR:    // 电机屏
-                for(int i=0; i<4; i++) {
-                    snprintf(buf, sizeof(buf), "%d", motor_data[i].motor_omega);
-                    ScreenManager_UpdateRegion(&screen_mgr, i, buf);
-                }
-                break;
+        case SCREEN_MOTOR: // 电机屏
+            for (int i = 0; i < 4; i++)
+            {
+                snprintf(buf, sizeof(buf), "%d", motor_data[i].motor_omega);
+                ScreenManager_UpdateRegion(&screen_mgr, i, buf);
+            }
+            break;
 
-
-            default: // SCREEN_DEFAULT及其他
-                // HAL_GPIO_WritePin(LED_R_GPIO_Port,LED_R_Pin,GPIO_PIN_SET);
-                break;
+        default: // SCREEN_DEFAULT及其他
+            // HAL_GPIO_WritePin(LED_R_GPIO_Port,LED_R_Pin,GPIO_PIN_SET);
+            break;
         }
 
         vTaskDelay(pdMS_TO_TICKS(200)); // 修正为200ms延时

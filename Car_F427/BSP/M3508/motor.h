@@ -59,6 +59,7 @@ typedef volatile struct
 /* 全局电机数据实例，volatile保证实时更新 */
 // 电调通信的CAN标识符，两个标识符(0200和0x1FF)各自对应控制4个电调，我们使用0X200
 #define CAN_ID_MOTOR_CONTROL 0x200
+
 extern const uint32_t motor_id[CAN_MOTOR_NUM];
 extern MotorRxData_t motor_data[CAN_MOTOR_NUM]; // 存放实时的电机数据
 

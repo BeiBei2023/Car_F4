@@ -37,23 +37,30 @@ typedef struct
     uint16_t flags; // 标志位（包含数字通道等信息）
 } sbus_data;
 
+extern sbus_data sbus_ch_data; 
 
 /**
- * @brief 我的遥控是SBUS值范围是 192 - 1792，中值为 992
+ * @brief 我的遥控是SBUS值范围是 
  * 
  */
+
+ /** 需要依据自己的遥控器更改-------------------- */
+
+ #define SBUS_TARGET_RANGE_MIN  1000    // SBUS目标最小值
+ #define SBUS_TARGET_RANGE_MAX  2000    // SBUS目标最大值
+/**---------------------------------------------*/
+
 #define SBUS_RANGE_MIN  192     // SBUS最小值
 #define SBUS_RANGE_MAX  1792    // SBUS最大值
 #define SBUS_RANGE_MID  992     // SBUS中值
 
-#define SBUS_TARGET_RANGE_MIN  1000    // SBUS目标最小值
-#define SBUS_TARGET_RANGE_MAX  2000    // SBUS目标最大值
 
 
 
 
 
-extern sbus_data sbus_ch_data; 
+
+
 
 
 void sbus_decode_frame(uint8_t *buf);
