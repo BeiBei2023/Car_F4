@@ -33,9 +33,9 @@ void task_remote_attr(void *argument)
     const uint32_t task_period = 7;                 // 10ms周期（100Hz）
     TickType_t xLastWakeTime = xTaskGetTickCount(); // 记录上次执行时间
     g_robot.motor_rpm[0] = 0;
-    g_robot.motor_rpm[0] = 0;
-    g_robot.motor_rpm[0] = 0;
-    g_robot.motor_rpm[0] = 0;
+    g_robot.motor_rpm[1] = 0;
+    g_robot.motor_rpm[2] = 0;
+    g_robot.motor_rpm[3] = 0;
 
     for (;;)
     {
@@ -78,10 +78,10 @@ void task_remote_attr(void *argument)
         float Vy = g_robot.vy * speed_scale;
         float Omega = g_robot.omega * omega_scale;
 
-        g_robot.motor_rpm[0] = (Vx - Vy - a_plus_b * Omega) * rpm_factor;
-        g_robot.motor_rpm[1] = (Vx + Vy - a_plus_b * Omega) * rpm_factor;
-        g_robot.motor_rpm[2] = (-Vx + Vy - a_plus_b * Omega) * rpm_factor;
-        g_robot.motor_rpm[3] = (-Vx - Vy - a_plus_b * Omega) * rpm_factor;
+        g_robot.motor_rpm[0] = (Vx - Vy + a_plus_b * Omega) * rpm_factor;
+        g_robot.motor_rpm[1] = (Vx + Vy + a_plus_b * Omega) * rpm_factor;
+        g_robot.motor_rpm[2] = (-Vx + Vy + a_plus_b * Omega) * rpm_factor;
+        g_robot.motor_rpm[3] = (-Vx - Vy + a_plus_b * Omega) * rpm_factor;
 
         for (int i = 0; i < 4; i++)
         {

@@ -7,7 +7,8 @@
   "settings": {
     "files.associations": {
       "st7735s.h": "c",
-      "log.h": "c"
+      "log.h": "c",
+      "sever_init.h": "c"
     }
   },
   "extensions": {}
