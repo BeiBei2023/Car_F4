@@ -3,7 +3,7 @@
 
 #include "pid.h"
 #include "drv_can.h"
-#include "log.h"
+
 #include "can.h"
 #include <math.h>
 /*

@@ -1,4 +1,5 @@
 #include "sbus.h"
+#include "elog.h"
 
 sbus_data sbus_ch_data; // 解析后的SBUS数据
 
@@ -34,6 +35,8 @@ void sbus_decode_frame(uint8_t *buf)
 
         sbus_ch_data.flags = buf[23];
     }
+
+    //log_d("SBUS Channels");
 }
 
 /**

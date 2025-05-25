@@ -5,6 +5,7 @@
 #include "button_config.h"
 #include "screen_config.h"
 #include "motor.h"
+#include "elog.h"
 
 RobotState g_robot;
 /*
@@ -23,16 +24,10 @@ RobotState g_robot;
 6.	根据根据辊子沿辊子轴平行方向速度与轮子的转速的关系，得到轮子转速
 */
 
-/*
-将底盘速度期望解算成四个电机的转速期望
-*/
-
 void task_remote_attr(void *argument)
 {
     const uint32_t task_period = 7;                 // 10ms周期（100Hz）
     TickType_t xLastWakeTime = xTaskGetTickCount(); // 记录上次执行时间
-
-    float speed_scale = 1.0f, omega_scale = 1.0f;
 
     g_robot.motor_rpm[0] = 0;
     g_robot.motor_rpm[1] = 0;
@@ -43,58 +38,58 @@ void task_remote_attr(void *argument)
     {
 
         // 归1
-        g_robot.vx = ((float)sbus_ch_data.channels[SBUS_CH_VX] - 1500.0f) / 500.0f;
-        g_robot.vy = ((float)sbus_ch_data.channels[SBUS_CH_VY] - 1500.0f) / 500.0f;
-        g_robot.omega = ((float)sbus_ch_data.channels[SBUS_CH_OMEGA] - 1500.0f) / 500.0f;
-
-        /* 速度档位处理 -------------------------------------------------*/
+        float x = ((float)sbus_ch_data.channels[SBUS_CH_VX] - 1500.0f) / 500.0f;
+        float y = ((float)sbus_ch_data.channels[SBUS_CH_VY] - 1500.0f) / 500.0f;
+        float w = ((float)sbus_ch_data.channels[SBUS_CH_OMEGA] - 1500.0f) / 500.0f;
         uint16_t gear_value = sbus_ch_data.channels[SBUS_CH_GEAR];
 
-        if (gear_value < 1500)
-            g_robot.speed_mode = 0; // 慢速
-        else if (gear_value > 1500)
-            g_robot.speed_mode = 2; // 快速
-        else
-            g_robot.speed_mode = 1; // 中速
-        /*****  --------------------------------------------------------- */
-
-        /* 调用 Mecanum_Calc */
-        const float a_plus_b = MECANUM_A + MECANUM_B;
-        const float rpm_factor = 60.0f / (2 * 3.1415926f * WHEEL_RADIUS) / cosf(180 / 4);
-
-        switch (g_robot.speed_mode)
-        {
-        case 0: // 低速档
-            speed_scale = 0.3f;
-            omega_scale = 0.5f;
-            break;
-        case 1: // 中速档
-            speed_scale = 1.0f;
-            omega_scale = 1.0f;
-            break;
-        case 2: // 高速档
-            speed_scale = 1.5f;
-            omega_scale = 2.0f;
-            break;
-        }
-
-        float Vx = g_robot.vx * speed_scale;
-        float Vy = g_robot.vy * speed_scale;
-        float Omega = g_robot.omega * omega_scale;
-
-        g_robot.motor_rpm[0] = (Vx - Vy + a_plus_b * Omega) * rpm_factor;
-        g_robot.motor_rpm[1] = (Vx + Vy + a_plus_b * Omega) * rpm_factor;
-        g_robot.motor_rpm[2] = (-Vx + Vy + a_plus_b * Omega) * rpm_factor;
-        g_robot.motor_rpm[3] = (-Vx - Vy + a_plus_b * Omega) * rpm_factor;
-
-        for (int i = 0; i < 4; i++)
-        {
-            g_robot.motor_rpm[i] = fmaxf(fminf(g_robot.motor_rpm[i], 4960.0f), -4960.0f);
-        }
+        target_speed_conversion(x, y, w, gear_value);
 
         vTaskDelayUntil(&xLastWakeTime, pdMS_TO_TICKS(task_period));
     }
 }
+
+void target_speed_conversion(float Vx, float Vy, float Omega, uint8_t mSpeedGear)
+{
+
+    // log_d("Vx: %f, Vy: %f, Omega: %f, mSpeedGear: %d\n", Vx, Vy, Omega, mSpeedGear);
+    /* 速度档位处理 */
+    float speed_scale, omega_scale = 0;
+
+    /* 调用 Mecanum_Calc */
+    const float a_plus_b = MECANUM_A + MECANUM_B;                                     // 轮子间距
+    const float rpm_factor = 60.0f / (2 * 3.1415926f * WHEEL_RADIUS) / cosf(180 / 4); // rpm转转角速度
+
+    switch (mSpeedGear)
+    {
+    case 1000:
+        speed_scale = 0.6f, omega_scale = 1.0f;
+        break;
+    case 1500:
+        speed_scale = 1.0f, omega_scale = 1.0f;
+        break;
+    case 2000:
+        speed_scale = 1.5f, omega_scale = 2.0f;
+        break;
+    default:
+        speed_scale = 1.0f, omega_scale = 1.0f;
+        break;
+    }
+    g_robot.vx = Vx * speed_scale;
+    g_robot.vy = Vy * speed_scale;
+    g_robot.omega = Omega * omega_scale;
+
+    g_robot.motor_rpm[0] = (g_robot.vx - g_robot.vy + a_plus_b * g_robot.omega) * rpm_factor;
+    g_robot.motor_rpm[1] = (g_robot.vx + g_robot.vy + a_plus_b * g_robot.omega) * rpm_factor;
+    g_robot.motor_rpm[2] = (-g_robot.vx + g_robot.vy + a_plus_b * g_robot.omega) * rpm_factor;
+    g_robot.motor_rpm[3] = (-g_robot.vx - g_robot.vy + a_plus_b * g_robot.omega) * rpm_factor;
+
+    for (int i = 0; i < 4; i++)
+    {
+        g_robot.motor_rpm[i] = fmaxf(fminf(g_robot.motor_rpm[i], 4960.0f), -4960.0f);
+    }
+}
+
 void task_led_attr(void *argument)
 {
     AHT20_Data_t sensorData;

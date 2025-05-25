@@ -51,6 +51,6 @@ void motor_task(void *argument)
                                       0);
         }
 
-        osDelay(1); // 每秒循环一次
+        osDelay(5); // 每秒循环一次
     }
 }

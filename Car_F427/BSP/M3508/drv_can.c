@@ -11,8 +11,7 @@
 /* Includes ------------------------------------------------------------------*/
 #include "drv_can.h"
 #include "main.h" // 包含hcan1定义
-#include "log.h"
-
+#include "elog.h"
 extern CAN_HandleTypeDef hcan;
 
 /* 宏定义 -------------------------------------------------------------------*/
@@ -71,7 +70,7 @@ void CAN_Filter_Mask_Config(CAN_HandleTypeDef *hcan, uint8_t Object_Para, uint32
 {
     if (!hcan || Object_Para > 0xFF)
     {
-        EMLOG(LOG_ERROR, "Invalid parameters in CAN_Filter_Mask_Config");
+        log_e("Invalid parameters in CAN_Filter_Mask_Config");
         return;
     }
     // CAN过滤器初始化结构体
@@ -120,7 +119,7 @@ uint8_t CAN_Send_Data(CAN_HandleTypeDef *hcan, uint16_t ID, uint8_t *Data, uint1
 {
     if (!hcan || !Data || Length > MAX_CAN_DATA_LENGTH)
     {
-        EMLOG(LOG_ERROR, "Invalid parameters in CAN_Send_Data");
+        log_e("Invalid parameters in CAN_Send_Data");
         return HAL_ERROR;
     }
 
@@ -139,8 +138,9 @@ uint8_t CAN_Send_Data(CAN_HandleTypeDef *hcan, uint16_t ID, uint8_t *Data, uint1
     uint8_t status = HAL_CAN_AddTxMessage(hcan, &tx_header, Data, &used_mailbox);
     if (status != HAL_OK)
     {
-        EMLOG(LOG_ERROR, "CAN Send Failed for ID: 0x%X", ID);
+        log_e("CAN Send Failed for Instance: 0x%X", (unsigned int)hcan->Instance);
     }
+
     return status;
 }
 
@@ -177,7 +177,7 @@ static void CAN_RxMsgPendingCallback(CAN_HandleTypeDef *hcan, uint8_t fifo)
         }
         else
         {
-            EMLOG(LOG_ERROR, "CAN Receive Failed for Instance: 0x%X", (unsigned int)hcan->Instance);
+            log_e("CAN Receive Failed for Instance: 0x%X", (unsigned int)hcan->Instance);
         }
     }
 }

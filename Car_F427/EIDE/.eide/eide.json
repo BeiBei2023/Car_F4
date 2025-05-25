@@ -52,9 +52,6 @@
                     "path": "../Core/Src/spi.c"
                   },
                   {
-                    "path": "../Core/Src/tim.c"
-                  },
-                  {
                     "path": "../Core/Src/usart.c"
                   },
                   {
@@ -219,15 +216,6 @@
             "folders": []
           },
           {
-            "name": "LOG",
-            "files": [
-              {
-                "path": "../BSP/LOG/log.c"
-              }
-            ],
-            "folders": []
-          },
-          {
             "name": "M3508",
             "files": [
               {
@@ -322,6 +310,33 @@
               },
               {
                 "path": "../BSP/BUTTON/button_config.c"
+              }
+            ],
+            "folders": []
+          },
+          {
+            "name": "MODBUS",
+            "files": [
+              {
+                "path": "../BSP/Modbus/Modbus.c"
+              },
+              {
+                "path": "../BSP/Modbus/UARTCallback.c"
+              }
+            ],
+            "folders": []
+          },
+          {
+            "name": "EASYLOGGER",
+            "files": [
+              {
+                "path": "../BSP/easylogger/src/elog.c"
+              },
+              {
+                "path": "../BSP/easylogger/src/elog_utils.c"
+              },
+              {
+                "path": "../BSP/easylogger/port/elog_port.c"
               }
             ],
             "folders": []
@@ -462,7 +477,7 @@
       "uploadConfig": {
         "bin": "",
         "proType": "SWD",
-        "resetMode": "default",
+        "resetMode": "SWrst",
         "runAfterProgram": true,
         "speed": 4000,
         "address": "0x8000000",
@@ -497,7 +512,6 @@
           "../Middlewares/Third_Party/FreeRTOS/Source/portable/RVDS/ARM_CM4F",
           "../BSP",
           "../BSP/SBUS",
-          "../BSP/LOG",
           "../BSP/M3508",
           "../BSP/PID",
           "../BSP/TASKS",
@@ -506,6 +520,10 @@
           "../BSP/AHT20",
           "../BSP/ADC",
           "../BSP/BUTTON",
+          "../BSP/Modbus",
+          "../BSP/easylogger",
+          "../BSP/easylogger/inc",
+          "../BSP/easylogger/port",
           "../MDK-ARM/RTE/_Car_F427"
         ],
         "libList": [],
@@ -520,7 +538,7 @@
           "beforeBuildTasks": [],
           "afterBuildTasks": [],
           "global": {
-            "use-microLIB": false,
+            "use-microLIB": true,
             "output-debug-info": "enable"
           },
           "c/cpp-compiler": {

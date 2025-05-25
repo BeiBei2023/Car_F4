@@ -8,7 +8,6 @@
 "car_f427\dma.o"
 "car_f427\i2c.o"
 "car_f427\spi.o"
-"car_f427\tim.o"
 "car_f427\usart.o"
 "car_f427\stm32f4xx_it.o"
 "car_f427\stm32f4xx_hal_msp.o"
@@ -48,7 +47,6 @@
 "car_f427\heap_4.o"
 "car_f427\port.o"
 "car_f427\sbus.o"
-"car_f427\log.o"
 "car_f427\drv_can.o"
 "car_f427\motor.o"
 "car_f427\pid.o"
@@ -66,7 +64,12 @@
 "car_f427\adc_v.o"
 "car_f427\multi_button.o"
 "car_f427\button_config.o"
---strict --scatter "Car_F427\Car_F427.sct"
+"car_f427\modbus.o"
+"car_f427\uartcallback.o"
+"car_f427\elog.o"
+"car_f427\elog_utils.o"
+"car_f427\elog_port.o"
+--library_type=microlib --strict --scatter "Car_F427\Car_F427.sct"
 --summary_stderr --info summarysizes --map --load_addr_map_info --xref --callgraph --symbols
 --info sizes --info totals --info unused --info veneers
 --list "Car_F427.map" -o Car_F427\Car_F427.axf

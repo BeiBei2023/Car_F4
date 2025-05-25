@@ -3,7 +3,7 @@
 
 #include "main.h"
 #include "cmsis_os.h"
-#include "log.h"
+
 #include "motor.h"
 
 void send_motor_data_task(void *argument);

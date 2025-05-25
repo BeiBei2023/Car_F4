@@ -25,7 +25,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include "sever_init.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -82,6 +82,13 @@ const osThreadAttr_t Task_LED_attributes = {
   .stack_size = 1024 * 4,
   .priority = (osPriority_t) osPriorityNormal,
 };
+/* Definitions for Modbus_Data */
+osThreadId_t Modbus_DataHandle;
+const osThreadAttr_t Modbus_Data_attributes = {
+  .name = "Modbus_Data",
+  .stack_size = 1024 * 4,
+  .priority = (osPriority_t) osPriorityLow,
+};
 /* Definitions for mutex */
 osMutexId_t mutexHandle;
 const osMutexAttr_t mutex_attributes = {
@@ -98,6 +105,7 @@ extern void motor_task(void *argument);
 extern void send_motor_data_task(void *argument);
 extern void task_remote_attr(void *argument);
 extern void task_led_attr(void *argument);
+extern void Modbus_DataUpdate(void *argument);
 
 void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
 
@@ -146,6 +154,9 @@ void MX_FREERTOS_Init(void) {
   /* creation of Task_LED */
   Task_LEDHandle = osThreadNew(task_led_attr, NULL, &Task_LED_attributes);
 
+  /* creation of Modbus_Data */
+  Modbus_DataHandle = osThreadNew(Modbus_DataUpdate, NULL, &Modbus_Data_attributes);
+
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
   /* USER CODE END RTOS_THREADS */
@@ -166,6 +177,7 @@ void MX_FREERTOS_Init(void) {
 void StartDefaultTask(void *argument)
 {
   /* USER CODE BEGIN StartDefaultTask */
+    init(); // 初始化电机和PID
   /* Infinite loop */
   for(;;)
   {

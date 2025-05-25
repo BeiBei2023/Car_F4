@@ -6,7 +6,7 @@
 void AHT20_Init()
 {
   uint8_t readBuffer;
-  HAL_Delay(40);
+ HAL_Delay(40);
   HAL_I2C_Master_Receive(&hi2c2, AHT20_ADDRESS, &readBuffer, 1, HAL_MAX_DELAY);
   if ((readBuffer & 0x08) == 0x00)
   {

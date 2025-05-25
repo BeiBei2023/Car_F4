@@ -30,6 +30,8 @@ typedef enum
 void EM_LOG(const int level, const char *fun, const int line, const char *fmt, ...);
 #define EMLOG(level, fmt, ...) EM_LOG(level, __FUNCTION__, __LINE__, fmt, ##__VA_ARGS__)
 
+void ProcessLog(void);
+void LogInit(void);
 
 /*与匿名助手发数据 4个数据   */
 void send_data(int16_t data1, int16_t data2, int16_t data3,int16_t data4,int16_t data5);

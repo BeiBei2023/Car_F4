@@ -6,14 +6,19 @@
 #include "aht20.h"
 #include "button_config.h"
 #include "screen_config.h"
+#include "elog.h"
 
 void init(void)
 {
 
+    log_i("init start");
     Button_Init();
+    log_i("Button_Init ok");
     /*-------------------初始化电机，绑定回调函数------------------------- */
 
     related_initialization_of_motors(motor_can, CAN_Motor_Call_Back); // 初始化电机
+
+    log_i("related_initialization_of_motors ok");
 
     /*-----------------------------------------------------------------*/
 
@@ -46,15 +51,24 @@ void init(void)
                     M3508_MOTOR_4_POSSITION_PID_KP,
                     M3508_MOTOR_4_POSSITION_PID_KI,
                     M3508_MOTOR_4_POSSITION_PID_KD);
+log_i("PID_struct_init ok");
     /*-----------------------------------------------------------------------*/
 
     ST7735_Init();
+
+    log_i("ST7735_Init ok");
 
     // 初始化界面管理器
     ScreenManager_Init(&screen_mgr, screens, 5);
     ScreenManager_Switch(&screen_mgr, 0);
 
-    AHT20_Init();
-    HAL_Delay(1000);
-    EMLOG(LOG_INFO, "init ok");
+    log_i("ScreenManager_Init ok");
+
+
+   AHT20_Init();
+
+    log_i("AHT20_Init ok");
+
+    log_i("all sever init ok");
+    
 }
