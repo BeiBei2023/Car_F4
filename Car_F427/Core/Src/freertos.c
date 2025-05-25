@@ -30,6 +30,7 @@
 #include "lv_demo_widgets.h"
 #include "UARTCallback.h"
 #include "elog.h"
+#include "ui.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -190,8 +191,10 @@ void StartDefaultTask(void *argument)
   log_d("lv_port_disp_init");
   osDelay(100); // 延时100ms，等待显示初始化完成
 
-  lv_demo_widgets(); // 显示LVGL演示界面
-  log_d("lv_demo_widgets");
+  ui_init(); // 初始化UI
+  log_d("ui_init");
+
+
   /* Infinite loop */
   for (;;)
   {

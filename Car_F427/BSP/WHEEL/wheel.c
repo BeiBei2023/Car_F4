@@ -155,6 +155,7 @@ void task_led_attr(void *argument)
     for (;;)
     {
         lv_task_handler(); // 处理LVGL任务
+        // ui_tick(); // LVGL UI tick
         osDelay(5);
     }
 }

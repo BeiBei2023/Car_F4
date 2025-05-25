@@ -352,7 +352,23 @@
         "folders": [
           {
             "name": "APP",
-            "files": [],
+            "files": [
+              {
+                "path": "../BSP/LVGL/ui/images.c"
+              },
+              {
+                "path": "../BSP/LVGL/ui/screens.c"
+              },
+              {
+                "path": "../BSP/LVGL/ui/styles.c"
+              },
+              {
+                "path": "../BSP/LVGL/ui/ui.c"
+              },
+              {
+                "path": "../BSP/LVGL/ui/ui_image_gdip.c"
+              }
+            ],
             "folders": []
           },
           {
@@ -1229,6 +1245,7 @@
           "../BSP/LVGL/src",
           "../BSP/LVGL/demos",
           "../BSP/LVGL/demos/widgets",
+          "../BSP/LVGL/ui",
           "../MDK-ARM/RTE/_Car_F427"
         ],
         "libList": [],

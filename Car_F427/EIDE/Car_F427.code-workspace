@@ -1,15 +1,9 @@
 {
-  "folders": [
-    {
-      "path": "."
-    }
-  ],
-  "settings": {
-    "files.associations": {
-      "st7735s.h": "c",
-      "uartcallback.h": "c",
-      "main.h": "c"
-    }
-  },
-  "extensions": {}
+    "folders": [
+        {
+            "path": "."
+        }
+    ],
+    "settings": {},
+    "extensions": {}
 }

@@ -36,6 +36,7 @@
 #include "elog.h"
 #include "st7735s.h"
 #include "lvgl.h"
+#include "ui.h"
 #include "UARTCallback.h"
 /* USER CODE END Includes */
 
@@ -227,6 +228,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
     // HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_5); // Toggle the LED on pin PA5
     // HAL_ADC_Start_IT(&hadc1); // Start ADC conversion
     lv_tick_inc(1); // LVGL tick increment
+   // ui_tick(); // LVGL UI tick
   }
 
   /* USER CODE END Callback 1 */
