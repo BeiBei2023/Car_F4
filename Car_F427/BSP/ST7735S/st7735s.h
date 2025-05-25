@@ -9,6 +9,10 @@
 #include <stdbool.h>
 #include <stdlib.h>
 #include "string.h"
+#include "FreeRTOS.h"
+#include "cmsis_os.h"
+
+
 
 #define ST7735_MADCTL_MY 0x80
 #define ST7735_MADCTL_MX 0x40

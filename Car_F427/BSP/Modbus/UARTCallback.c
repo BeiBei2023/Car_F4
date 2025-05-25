@@ -20,14 +20,17 @@ extern UART_HandleTypeDef huart6;
 int fputc(int ch, FILE *f)
 {
   // 采用轮询方式发送1字节数据，超时时间设置为无限等待
-  HAL_UART_Transmit(Sprint_port, (uint8_t *)&ch, 1, HAL_MAX_DELAY);
+  HAL_UART_Transmit(Sprint_port, (uint8_t *)&ch, 1, 0xFFFF);
   return ch;
 }
+
+
+
 int fgetc(FILE *f)
 {
   uint8_t ch;
   // 采用轮询方式接收 1字节数据，超时时间设置为无限等待
-  HAL_UART_Receive(Sprint_port, (uint8_t *)&ch, 1, HAL_MAX_DELAY);
+  HAL_UART_Receive(Sprint_port, (uint8_t *)&ch, 1, 1000);
   return ch;
 }
 
@@ -54,7 +57,7 @@ void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t Size)
   }
 }
 
-void HAL_USART_INIT(void)
+void USER_USART_INIT(void)
 {
   __HAL_UART_ENABLE_IT(&huart3, UART_IT_IDLE);                  // 使能USART6接收中断
   HAL_UARTEx_ReceiveToIdle_DMA(&huart3, USART6_RX_BUFFER, 256); // 开始接收数据

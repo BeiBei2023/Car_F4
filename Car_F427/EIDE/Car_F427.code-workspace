@@ -6,7 +6,9 @@
   ],
   "settings": {
     "files.associations": {
-      "uartcallback.h": "c"
+      "st7735s.h": "c",
+      "uartcallback.h": "c",
+      "main.h": "c"
     }
   },
   "extensions": {}

@@ -1,20 +1,20 @@
 /* USER CODE BEGIN Header */
 /**
-  ******************************************************************************
-  * File Name          : freertos.c
-  * Description        : Code for freertos applications
-  ******************************************************************************
-  * @attention
-  *
-  * Copyright (c) 2025 STMicroelectronics.
-  * All rights reserved.
-  *
-  * This software is licensed under terms that can be found in the LICENSE file
-  * in the root directory of this software component.
-  * If no LICENSE file comes with this software, it is provided AS-IS.
-  *
-  ******************************************************************************
-  */
+ ******************************************************************************
+ * File Name          : freertos.c
+ * Description        : Code for freertos applications
+ ******************************************************************************
+ * @attention
+ *
+ * Copyright (c) 2025 STMicroelectronics.
+ * All rights reserved.
+ *
+ * This software is licensed under terms that can be found in the LICENSE file
+ * in the root directory of this software component.
+ * If no LICENSE file comes with this software, it is provided AS-IS.
+ *
+ ******************************************************************************
+ */
 /* USER CODE END Header */
 
 /* Includes ------------------------------------------------------------------*/
@@ -26,6 +26,10 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "sever_init.h"
+#include "lv_port_disp.h"
+#include "lv_demo_widgets.h"
+#include "UARTCallback.h"
+#include "elog.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -50,50 +54,49 @@
 /* Definitions for MainTask */
 osThreadId_t MainTaskHandle;
 const osThreadAttr_t MainTask_attributes = {
-  .name = "MainTask",
-  .stack_size = 128 * 4,
-  .priority = (osPriority_t) osPriorityNormal,
+    .name = "MainTask",
+    .stack_size = 1024 * 4,
+    .priority = (osPriority_t)osPriorityNormal,
 };
 /* Definitions for MotorTask */
 osThreadId_t MotorTaskHandle;
 const osThreadAttr_t MotorTask_attributes = {
-  .name = "MotorTask",
-  .stack_size = 1024 * 4,
-  .priority = (osPriority_t) osPriorityRealtime,
+    .name = "MotorTask",
+    .stack_size = 1024 * 4,
+    .priority = (osPriority_t)osPriorityRealtime,
 };
 /* Definitions for MotorDataTask */
 osThreadId_t MotorDataTaskHandle;
 const osThreadAttr_t MotorDataTask_attributes = {
-  .name = "MotorDataTask",
-  .stack_size = 1024 * 4,
-  .priority = (osPriority_t) osPriorityBelowNormal,
+    .name = "MotorDataTask",
+    .stack_size = 1024 * 4,
+    .priority = (osPriority_t)osPriorityBelowNormal,
 };
 /* Definitions for Task_Remote */
 osThreadId_t Task_RemoteHandle;
 const osThreadAttr_t Task_Remote_attributes = {
-  .name = "Task_Remote",
-  .stack_size = 1024 * 4,
-  .priority = (osPriority_t) osPriorityHigh7,
+    .name = "Task_Remote",
+    .stack_size = 1024 * 4,
+    .priority = (osPriority_t)osPriorityHigh7,
 };
 /* Definitions for Task_LED */
 osThreadId_t Task_LEDHandle;
 const osThreadAttr_t Task_LED_attributes = {
-  .name = "Task_LED",
-  .stack_size = 1024 * 4,
-  .priority = (osPriority_t) osPriorityNormal,
+    .name = "Task_LED",
+    .stack_size = 1024 * 4,
+    .priority = (osPriority_t)osPriorityNormal,
 };
 /* Definitions for Modbus_Data */
 osThreadId_t Modbus_DataHandle;
 const osThreadAttr_t Modbus_Data_attributes = {
-  .name = "Modbus_Data",
-  .stack_size = 1024 * 4,
-  .priority = (osPriority_t) osPriorityLow,
+    .name = "Modbus_Data",
+    .stack_size = 1024 * 4,
+    .priority = (osPriority_t)osPriorityLow,
 };
 /* Definitions for mutex */
 osMutexId_t mutexHandle;
 const osMutexAttr_t mutex_attributes = {
-  .name = "mutex"
-};
+    .name = "mutex"};
 
 /* Private function prototypes -----------------------------------------------*/
 /* USER CODE BEGIN FunctionPrototypes */
@@ -110,11 +113,12 @@ extern void Modbus_DataUpdate(void *argument);
 void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
 
 /**
-  * @brief  FreeRTOS initialization
-  * @param  None
-  * @retval None
-  */
-void MX_FREERTOS_Init(void) {
+ * @brief  FreeRTOS initialization
+ * @param  None
+ * @retval None
+ */
+void MX_FREERTOS_Init(void)
+{
   /* USER CODE BEGIN Init */
 
   /* USER CODE END Init */
@@ -164,22 +168,32 @@ void MX_FREERTOS_Init(void) {
   /* USER CODE BEGIN RTOS_EVENTS */
   /* add events, ... */
   /* USER CODE END RTOS_EVENTS */
-
 }
 
 /* USER CODE BEGIN Header_StartDefaultTask */
 /**
-  * @brief  Function implementing the MainTask thread.
-  * @param  argument: Not used
-  * @retval None
-  */
+ * @brief  Function implementing the MainTask thread.
+ * @param  argument: Not used
+ * @retval None
+ */
 /* USER CODE END Header_StartDefaultTask */
 void StartDefaultTask(void *argument)
 {
   /* USER CODE BEGIN StartDefaultTask */
-    init(); // 初始化电机和PID
+  init();
+
+  log_d("StartDefaultTask");
+  lv_init(); // 初始化LVGL
+  log_d("lv_init");
+  osDelay(100);        // 延时100ms，等待LVGL初始化完成
+  lv_port_disp_init(); // 显示初始化
+  log_d("lv_port_disp_init");
+  osDelay(100); // 延时100ms，等待显示初始化完成
+
+  lv_demo_widgets(); // 显示LVGL演示界面
+  log_d("lv_demo_widgets");
   /* Infinite loop */
-  for(;;)
+  for (;;)
   {
     osDelay(1);
   }
@@ -190,4 +204,3 @@ void StartDefaultTask(void *argument)
 /* USER CODE BEGIN Application */
 
 /* USER CODE END Application */
-

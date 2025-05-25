@@ -43,26 +43,26 @@ ARM Macro Assembler    Page 1
    27 00000000         ;   <o> Stack Size (in Bytes) <0x0-0xFFFFFFFF:8>
    28 00000000         ; </h>
    29 00000000         
-   30 00000000 00008000 
+   30 00000000 00007000 
                        Stack_Size
-                               EQU              0x8000
+                               EQU              0x7000
    31 00000000         
    32 00000000                 AREA             STACK, NOINIT, READWRITE, ALIGN
 =3
    33 00000000         Stack_Mem
                                SPACE            Stack_Size
-   34 00008000         __initial_sp
-   35 00008000         
-   36 00008000         
-   37 00008000         ; <h> Heap Configuration
-   38 00008000         ;   <o>  Heap Size (in Bytes) <0x0-0xFFFFFFFF:8>
-   39 00008000         ; </h>
-   40 00008000         
-   41 00008000 00008000 
+   34 00007000         __initial_sp
+   35 00007000         
+   36 00007000         
+   37 00007000         ; <h> Heap Configuration
+   38 00007000         ;   <o>  Heap Size (in Bytes) <0x0-0xFFFFFFFF:8>
+   39 00007000         ; </h>
+   40 00007000         
+   41 00007000 00006000 
                        Heap_Size
-                               EQU              0x8000
-   42 00008000         
-   43 00008000                 AREA             HEAP, NOINIT, READWRITE, ALIGN=
+                               EQU              0x6000
+   42 00007000         
+   43 00007000                 AREA             HEAP, NOINIT, READWRITE, ALIGN=
 
 
 
@@ -73,14 +73,14 @@ ARM Macro Assembler    Page 2
    44 00000000         __heap_base
    45 00000000         Heap_Mem
                                SPACE            Heap_Size
-   46 00008000         __heap_limit
-   47 00008000         
-   48 00008000                 PRESERVE8
-   49 00008000                 THUMB
-   50 00008000         
-   51 00008000         
-   52 00008000         ; Vector Table Mapped to Address 0 at Reset
-   53 00008000                 AREA             RESET, DATA, READONLY
+   46 00006000         __heap_limit
+   47 00006000         
+   48 00006000                 PRESERVE8
+   49 00006000                 THUMB
+   50 00006000         
+   51 00006000         
+   52 00006000         ; Vector Table Mapped to Address 0 at Reset
+   53 00006000                 AREA             RESET, DATA, READONLY
    54 00000000                 EXPORT           __Vectors
    55 00000000                 EXPORT           __Vectors_End
    56 00000000                 EXPORT           __Vectors_Size
@@ -888,7 +888,7 @@ Symbol: Stack_Mem
    Uses
       None
 Comment: Stack_Mem unused
-__initial_sp 00008000
+__initial_sp 00007000
 
 Symbol: __initial_sp
    Definitions
@@ -928,7 +928,7 @@ Symbol: __heap_base
    Uses
       At line 421 in file startup_stm32f427xx.s
 Comment: __heap_base used once
-__heap_limit 00008000
+__heap_limit 00006000
 
 Symbol: __heap_limit
    Definitions
@@ -1971,7 +1971,7 @@ Symbol: WWDG_IRQHandler
 ARM Macro Assembler    Page 1 Alphabetic symbol ordering
 Absolute symbols
 
-Heap_Size 00008000
+Heap_Size 00006000
 
 Symbol: Heap_Size
    Definitions
@@ -1979,7 +1979,7 @@ Symbol: Heap_Size
    Uses
       At line 45 in file startup_stm32f427xx.s
 Comment: Heap_Size used once
-Stack_Size 00008000
+Stack_Size 00007000
 
 Symbol: Stack_Size
    Definitions

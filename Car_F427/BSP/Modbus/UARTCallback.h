@@ -13,6 +13,6 @@
 #include <stdio.h> // 包含标准输入输出头文件
 #include "sbus.h"
 
-void HAL_USART_INIT(void);
+void USER_USART_INIT(void);
 
 #endif // !__UARTCALLBACK_H_

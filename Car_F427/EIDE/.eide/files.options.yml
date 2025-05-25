@@ -23,6 +23,7 @@ options:
             <virtual_root>/Application/User/Core/can.c: ""
             <virtual_root>/Application/User/Core/i2c.c: ""
             <virtual_root>/Application/User/Core/spi.c: ""
+            <virtual_root>/Application/User/Core/tim.c: ""
             <virtual_root>/Application/User/Core/stm32f4xx_hal_timebase_tim.c: ""
             <virtual_root>/Drivers/STM32F4xx_HAL_Driver/stm32f4xx_hal_tim.c: ""
             <virtual_root>/Drivers/STM32F4xx_HAL_Driver/stm32f4xx_hal_tim_ex.c: ""
