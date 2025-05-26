@@ -38,6 +38,7 @@
 #include "lvgl.h"
 #include "ui.h"
 #include "UARTCallback.h"
+#include "QMI8658A.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -124,6 +125,8 @@ int main(void)
   Modbus_Init(0x01); // 初始化Modbus，设置从站地址为0x01
                      // init(); // 初始化电机和PID
                      // ST7735_Init();
+
+
 
   /* USER CODE END 2 */
 

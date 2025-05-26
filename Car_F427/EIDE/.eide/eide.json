@@ -343,6 +343,15 @@
               }
             ],
             "folders": []
+          },
+          {
+            "name": "IMU",
+            "files": [
+              {
+                "path": "../BSP/IMU/QMI8658A.c"
+              }
+            ],
+            "folders": []
           }
         ]
       },
@@ -1241,6 +1250,7 @@
           "../BSP/easylogger",
           "../BSP/easylogger/inc",
           "../BSP/easylogger/port",
+          "../BSP/IMU",
           "../BSP/LVGL",
           "../BSP/LVGL/src",
           "../BSP/LVGL/demos",

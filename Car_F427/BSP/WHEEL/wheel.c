@@ -93,7 +93,7 @@ void target_speed_conversion(float Vx, float Vy, float Omega, uint8_t mSpeedGear
 
 void task_led_attr(void *argument)
 {
-    // AHT20_Data_t sensorData;
+
     // char buf[20]; // 复用缓冲区
 
     // // 用枚举替代魔数,要根据屏幕顺序来排列
@@ -154,6 +154,7 @@ void task_led_attr(void *argument)
     // HAL_GPIO_WritePin(LED_R_GPIO_Port,LED_R_Pin,GPIO_PIN_SET);
     for (;;)
     {
+
         lv_task_handler(); // 处理LVGL任务
         // ui_tick(); // LVGL UI tick
         osDelay(5);

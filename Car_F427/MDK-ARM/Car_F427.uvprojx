@@ -340,7 +340,7 @@
               <MiscControls></MiscControls>
               <Define>USE_HAL_DRIVER,STM32F427xx,LV_LVGL_H_INCLUDE_SIMPLE</Define>
               <Undefine></Undefine>
-              <IncludePath>../Core/Inc;../Drivers/STM32F4xx_HAL_Driver/Inc;../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy;../Drivers/CMSIS/Device/ST/STM32F4xx/Include;../Drivers/CMSIS/Include;../Middlewares/Third_Party/FreeRTOS/Source/include;../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2;../Middlewares/Third_Party/FreeRTOS/Source/portable/RVDS/ARM_CM4F;../BSP;../BSP/SBUS;../BSP/M3508;../BSP/PID;../BSP/TASKS;../BSP/WHEEL;../BSP/ST7735S;../BSP/AHT20;../BSP/ADC;../BSP/BUTTON;../BSP/Modbus;../BSP/easylogger;../BSP/easylogger/inc;../BSP/easylogger/port;../BSP/LVGL;../BSP/LVGL/src;../BSP/LVGL/demos;../BSP/LVGL/demos/widgets;..\BSP\LVGL\ui</IncludePath>
+              <IncludePath>../Core/Inc;../Drivers/STM32F4xx_HAL_Driver/Inc;../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy;../Drivers/CMSIS/Device/ST/STM32F4xx/Include;../Drivers/CMSIS/Include;../Middlewares/Third_Party/FreeRTOS/Source/include;../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2;../Middlewares/Third_Party/FreeRTOS/Source/portable/RVDS/ARM_CM4F;../BSP;../BSP/SBUS;../BSP/M3508;../BSP/PID;../BSP/TASKS;../BSP/WHEEL;../BSP/ST7735S;../BSP/AHT20;../BSP/ADC;../BSP/BUTTON;../BSP/Modbus;../BSP/easylogger;../BSP/easylogger/inc;../BSP/easylogger/port;..\BSP\IMU;../BSP/LVGL;../BSP/LVGL/src;../BSP/LVGL/demos;../BSP/LVGL/demos/widgets;..\BSP\LVGL\ui</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -2208,6 +2208,16 @@
               <FileName>elog_port.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\BSP\easylogger\port\elog_port.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>BSP/IMU</GroupName>
+          <Files>
+            <File>
+              <FileName>QMI8658A.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\BSP\IMU\QMI8658A.c</FilePath>
             </File>
           </Files>
         </Group>

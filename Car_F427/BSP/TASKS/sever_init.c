@@ -7,6 +7,7 @@
 #include "button_config.h"
 #include "screen_config.h"
 #include "elog.h"
+#include "QMI8658A.h"
 
 void init(void)
 {
@@ -54,19 +55,12 @@ void init(void)
     log_i("PID_struct_init ok");
     /*-----------------------------------------------------------------------*/
 
-    // ST7735_Init();
-
-    // log_i("ST7735_Init ok");
-
-    // // 初始化界面管理器
-    // ScreenManager_Init(&screen_mgr, screens, 5);
-    // ScreenManager_Switch(&screen_mgr, 0);
-
-    // log_i("ScreenManager_Init ok");
-
     AHT20_Init();
 
-    log_i("AHT20_Init ok");
+
+
+    QMI8658A_Init(); // 初始化QMI8658A传感器
+
 
     log_i("all sever init ok");
 }

@@ -70,6 +70,7 @@
 "car_f427\elog.o"
 "car_f427\elog_utils.o"
 "car_f427\elog_port.o"
+"car_f427\qmi8658a.o"
 "car_f427\images.o"
 "car_f427\screens.o"
 "car_f427\styles.o"

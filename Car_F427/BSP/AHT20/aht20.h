@@ -4,6 +4,7 @@
 #include "stm32f4xx_hal.h"
 #include "main.h"
 #include <stdint.h>
+#include "elog.h"
 
  extern I2C_HandleTypeDef hi2c2;
  #define AHT20_ADDRESS 0x70
