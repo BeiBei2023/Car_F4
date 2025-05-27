@@ -36,9 +36,12 @@
 #include "elog.h"
 #include "st7735s.h"
 #include "lvgl.h"
-#include "ui.h"
+
 #include "UARTCallback.h"
 #include "QMI8658A.h"
+
+
+
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -128,6 +131,7 @@ int main(void)
 
 
 
+	
   /* USER CODE END 2 */
 
   /* Init scheduler */

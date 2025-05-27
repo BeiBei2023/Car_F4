@@ -30,7 +30,11 @@
 #include "lv_demo_widgets.h"
 #include "UARTCallback.h"
 #include "elog.h"
-#include "ui.h"
+
+#include "events_init.h"
+#include "gui_guider.h"
+
+lv_ui guider_ui;
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -120,55 +124,55 @@ void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
  */
 void MX_FREERTOS_Init(void)
 {
-  /* USER CODE BEGIN Init */
+    /* USER CODE BEGIN Init */
 
-  /* USER CODE END Init */
-  /* Create the mutex(es) */
-  /* creation of mutex */
-  mutexHandle = osMutexNew(&mutex_attributes);
+    /* USER CODE END Init */
+    /* Create the mutex(es) */
+    /* creation of mutex */
+    mutexHandle = osMutexNew(&mutex_attributes);
 
-  /* USER CODE BEGIN RTOS_MUTEX */
-  /* add mutexes, ... */
-  /* USER CODE END RTOS_MUTEX */
+    /* USER CODE BEGIN RTOS_MUTEX */
+    /* add mutexes, ... */
+    /* USER CODE END RTOS_MUTEX */
 
-  /* USER CODE BEGIN RTOS_SEMAPHORES */
-  /* add semaphores, ... */
-  /* USER CODE END RTOS_SEMAPHORES */
+    /* USER CODE BEGIN RTOS_SEMAPHORES */
+    /* add semaphores, ... */
+    /* USER CODE END RTOS_SEMAPHORES */
 
-  /* USER CODE BEGIN RTOS_TIMERS */
-  /* start timers, add new ones, ... */
-  /* USER CODE END RTOS_TIMERS */
+    /* USER CODE BEGIN RTOS_TIMERS */
+    /* start timers, add new ones, ... */
+    /* USER CODE END RTOS_TIMERS */
 
-  /* USER CODE BEGIN RTOS_QUEUES */
-  /* add queues, ... */
-  /* USER CODE END RTOS_QUEUES */
+    /* USER CODE BEGIN RTOS_QUEUES */
+    /* add queues, ... */
+    /* USER CODE END RTOS_QUEUES */
 
-  /* Create the thread(s) */
-  /* creation of MainTask */
-  MainTaskHandle = osThreadNew(StartDefaultTask, NULL, &MainTask_attributes);
+    /* Create the thread(s) */
+    /* creation of MainTask */
+    MainTaskHandle = osThreadNew(StartDefaultTask, NULL, &MainTask_attributes);
 
-  /* creation of MotorTask */
-  MotorTaskHandle = osThreadNew(motor_task, NULL, &MotorTask_attributes);
+    /* creation of MotorTask */
+    MotorTaskHandle = osThreadNew(motor_task, NULL, &MotorTask_attributes);
 
-  /* creation of MotorDataTask */
-  MotorDataTaskHandle = osThreadNew(send_motor_data_task, NULL, &MotorDataTask_attributes);
+    /* creation of MotorDataTask */
+    MotorDataTaskHandle = osThreadNew(send_motor_data_task, NULL, &MotorDataTask_attributes);
 
-  /* creation of Task_Remote */
-  Task_RemoteHandle = osThreadNew(task_remote_attr, NULL, &Task_Remote_attributes);
+    /* creation of Task_Remote */
+    Task_RemoteHandle = osThreadNew(task_remote_attr, NULL, &Task_Remote_attributes);
 
-  /* creation of Task_LED */
-  Task_LEDHandle = osThreadNew(task_led_attr, NULL, &Task_LED_attributes);
+    /* creation of Task_LED */
+    Task_LEDHandle = osThreadNew(task_led_attr, NULL, &Task_LED_attributes);
 
-  /* creation of Modbus_Data */
-  Modbus_DataHandle = osThreadNew(Modbus_DataUpdate, NULL, &Modbus_Data_attributes);
+    /* creation of Modbus_Data */
+    Modbus_DataHandle = osThreadNew(Modbus_DataUpdate, NULL, &Modbus_Data_attributes);
 
-  /* USER CODE BEGIN RTOS_THREADS */
-  /* add threads, ... */
-  /* USER CODE END RTOS_THREADS */
+    /* USER CODE BEGIN RTOS_THREADS */
+    /* add threads, ... */
+    /* USER CODE END RTOS_THREADS */
 
-  /* USER CODE BEGIN RTOS_EVENTS */
-  /* add events, ... */
-  /* USER CODE END RTOS_EVENTS */
+    /* USER CODE BEGIN RTOS_EVENTS */
+    /* add events, ... */
+    /* USER CODE END RTOS_EVENTS */
 }
 
 /* USER CODE BEGIN Header_StartDefaultTask */
@@ -180,27 +184,28 @@ void MX_FREERTOS_Init(void)
 /* USER CODE END Header_StartDefaultTask */
 void StartDefaultTask(void *argument)
 {
-  /* USER CODE BEGIN StartDefaultTask */
-  init();
+    /* USER CODE BEGIN StartDefaultTask */
+    log_i("StartDefaultTask");
+    init();
 
-  log_d("StartDefaultTask");
-  lv_init(); // 初始化LVGL
-  log_d("lv_init");
-  osDelay(100);        // 延时100ms，等待LVGL初始化完成
-  lv_port_disp_init(); // 显示初始化
-  log_d("lv_port_disp_init");
-  osDelay(100); // 延时100ms，等待显示初始化完成
+    
+    lv_init(); // 初始化LVGL
+    log_i("lv_init");
+    osDelay(100);        // 延时100ms，等待LVGL初始化完成
+    lv_port_disp_init(); // 显示初始化
+    log_i("lv_port_disp_init");
+    osDelay(1000); // 延时100ms，等待显示初始化完成
 
-  ui_init(); // 初始化UI
-  log_d("ui_init");
+    log_i("ui_init");
+    setup_ui(&guider_ui);
+    events_init(&guider_ui);
 
-
-  /* Infinite loop */
-  for (;;)
-  {
-    osDelay(1);
-  }
-  /* USER CODE END StartDefaultTask */
+    /* Infinite loop */
+    for (;;)
+    {
+        osDelay(1);
+    }
+    /* USER CODE END StartDefaultTask */
 }
 
 /* Private application code --------------------------------------------------*/

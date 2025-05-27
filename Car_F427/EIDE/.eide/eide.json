@@ -271,18 +271,6 @@
             "files": [
               {
                 "path": "../BSP/ST7735S/st7735s.c"
-              },
-              {
-                "path": "../BSP/ST7735S/fonts.c"
-              },
-              {
-                "path": "../BSP/ST7735S/image.c"
-              },
-              {
-                "path": "../BSP/ST7735S/screen_manager.c"
-              },
-              {
-                "path": "../BSP/ST7735S/screen_config.c"
               }
             ],
             "folders": []
@@ -363,19 +351,22 @@
             "name": "APP",
             "files": [
               {
-                "path": "../BSP/LVGL/ui/images.c"
+                "path": "../BSP/LVGL/ui/custom/custom.c"
               },
               {
-                "path": "../BSP/LVGL/ui/screens.c"
+                "path": "../BSP/LVGL/ui/generated/events_init.c"
               },
               {
-                "path": "../BSP/LVGL/ui/styles.c"
+                "path": "../BSP/LVGL/ui/generated/gui_guider.c"
               },
               {
-                "path": "../BSP/LVGL/ui/ui.c"
+                "path": "../BSP/LVGL/ui/generated/setup_scr_screen.c"
               },
               {
-                "path": "../BSP/LVGL/ui/ui_image_gdip.c"
+                "path": "../BSP/LVGL/ui/generated/widgets_init.c"
+              },
+              {
+                "path": "../BSP/LVGL/ui/generated/images/_555_alpha_160x80.c"
               }
             ],
             "folders": []
@@ -1256,6 +1247,11 @@
           "../BSP/LVGL/demos",
           "../BSP/LVGL/demos/widgets",
           "../BSP/LVGL/ui",
+          "../BSP/LVGL/ui/custom",
+          "../BSP/LVGL/ui/generated",
+          "../BSP/LVGL/ui/generated/guider_customer_fonts",
+          "../BSP/LVGL/ui/generated/guider_fonts",
+          "../BSP/LVGL/ui/generated/images",
           "../MDK-ARM/RTE/_Car_F427"
         ],
         "libList": [],

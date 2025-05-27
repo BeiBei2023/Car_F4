@@ -1,13 +1,9 @@
 {
-  "folders": [
-    {
-      "path": "."
-    }
-  ],
-  "settings": {
-    "files.associations": {
-      "aht20.h": "c"
-    }
-  },
-  "extensions": {}
+    "folders": [
+        {
+            "path": "."
+        }
+    ],
+    "settings": {},
+    "extensions": {}
 }
