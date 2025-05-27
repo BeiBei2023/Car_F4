@@ -354,19 +354,37 @@
                 "path": "../BSP/LVGL/ui/custom/custom.c"
               },
               {
+                "path": "../BSP/LVGL/ui/generated/guider_fonts/lv_font_montserratMedium_12.c"
+              },
+              {
+                "path": "../BSP/LVGL/ui/generated/guider_fonts/lv_font_montserratMedium_16.c"
+              },
+              {
+                "path": "../BSP/LVGL/ui/generated/guider_fonts/lv_font_SourceHanSerifSC_Regular_8.c"
+              },
+              {
+                "path": "../BSP/LVGL/ui/generated/guider_fonts/lv_font_SourceHanSerifSC_Regular_9.c"
+              },
+              {
+                "path": "../BSP/LVGL/ui/generated/guider_fonts/lv_font_SourceHanSerifSC_Regular_16.c"
+              },
+              {
+                "path": "../BSP/LVGL/ui/generated/images/_555_alpha_160x80.c"
+              },
+              {
                 "path": "../BSP/LVGL/ui/generated/events_init.c"
               },
               {
                 "path": "../BSP/LVGL/ui/generated/gui_guider.c"
               },
               {
-                "path": "../BSP/LVGL/ui/generated/setup_scr_screen.c"
+                "path": "../BSP/LVGL/ui/generated/setup_scr_main.c"
+              },
+              {
+                "path": "../BSP/LVGL/ui/generated/setup_scr_Voltage.c"
               },
               {
                 "path": "../BSP/LVGL/ui/generated/widgets_init.c"
-              },
-              {
-                "path": "../BSP/LVGL/ui/generated/images/_555_alpha_160x80.c"
               }
             ],
             "folders": []

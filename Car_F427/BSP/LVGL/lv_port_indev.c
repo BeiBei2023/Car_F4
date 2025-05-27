@@ -4,14 +4,15 @@
  */
 
 /*Copy this file as "lv_port_indev.c" and set this value to "1" to enable content*/
-#if 0
+#if 1
 
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_port_indev_template.h"
+#include "lv_port_indev.h"
 #include "../../lvgl.h"
 
+#include "elog.h"
 /*********************
  *      DEFINES
  *********************/
@@ -23,41 +24,54 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-
+#if 0
 static void touchpad_init(void);
 static void touchpad_read(lv_indev_drv_t * indev_drv, lv_indev_data_t * data);
 static bool touchpad_is_pressed(void);
 static void touchpad_get_xy(lv_coord_t * x, lv_coord_t * y);
+#endif
 
+#if 0
 static void mouse_init(void);
 static void mouse_read(lv_indev_drv_t * indev_drv, lv_indev_data_t * data);
 static bool mouse_is_pressed(void);
 static void mouse_get_xy(lv_coord_t * x, lv_coord_t * y);
+#endif
 
+#if 0
 static void keypad_init(void);
 static void keypad_read(lv_indev_drv_t * indev_drv, lv_indev_data_t * data);
 static uint32_t keypad_get_key(void);
+
+#endif
+
+#if 0
+
 
 static void encoder_init(void);
 static void encoder_read(lv_indev_drv_t * indev_drv, lv_indev_data_t * data);
 static void encoder_handler(void);
 
+#endif
 static void button_init(void);
-static void button_read(lv_indev_drv_t * indev_drv, lv_indev_data_t * data);
+static void button_read(lv_indev_drv_t *indev_drv, lv_indev_data_t *data);
 static int8_t button_get_pressed_id(void);
 static bool button_is_pressed(uint8_t id);
 
 /**********************
  *  STATIC VARIABLES
  **********************/
-lv_indev_t * indev_touchpad;
-lv_indev_t * indev_mouse;
-lv_indev_t * indev_keypad;
-lv_indev_t * indev_encoder;
-lv_indev_t * indev_button;
+lv_indev_t *indev_touchpad;
+lv_indev_t *indev_mouse;
+lv_indev_t *indev_keypad;
+lv_indev_t *indev_encoder;
+lv_indev_t *indev_button;
 
+#if 0
 static int32_t encoder_diff;
 static lv_indev_state_t encoder_state;
+
+#endif
 
 /**********************
  *      MACROS
@@ -88,6 +102,8 @@ void lv_port_indev_init(void)
      * -----------------*/
 
     /*Initialize your touchpad if you have*/
+#if 0
+
     touchpad_init();
 
     /*Register a touchpad input device*/
@@ -95,12 +111,14 @@ void lv_port_indev_init(void)
     indev_drv.type = LV_INDEV_TYPE_POINTER;
     indev_drv.read_cb = touchpad_read;
     indev_touchpad = lv_indev_drv_register(&indev_drv);
-
+#endif
     /*------------------
      * Mouse
      * -----------------*/
 
     /*Initialize your mouse if you have*/
+#if 0
+
     mouse_init();
 
     /*Register a mouse input device*/
@@ -114,11 +132,14 @@ void lv_port_indev_init(void)
     lv_img_set_src(mouse_cursor, LV_SYMBOL_HOME);
     lv_indev_set_cursor(indev_mouse, mouse_cursor);
 
+#endif
     /*------------------
      * Keypad
      * -----------------*/
 
     /*Initialize your keypad or keyboard if you have*/
+#if 0
+
     keypad_init();
 
     /*Register a keypad input device*/
@@ -126,6 +147,8 @@ void lv_port_indev_init(void)
     indev_drv.type = LV_INDEV_TYPE_KEYPAD;
     indev_drv.read_cb = keypad_read;
     indev_keypad = lv_indev_drv_register(&indev_drv);
+
+#endif
 
     /*Later you should create group(s) with `lv_group_t * group = lv_group_create()`,
      *add objects to the group with `lv_group_add_obj(group, obj)`
@@ -137,6 +160,8 @@ void lv_port_indev_init(void)
      * -----------------*/
 
     /*Initialize your encoder if you have*/
+#if 0
+
     encoder_init();
 
     /*Register a encoder input device*/
@@ -144,6 +169,8 @@ void lv_port_indev_init(void)
     indev_drv.type = LV_INDEV_TYPE_ENCODER;
     indev_drv.read_cb = encoder_read;
     indev_encoder = lv_indev_drv_register(&indev_drv);
+
+#endif
 
     /*Later you should create group(s) with `lv_group_t * group = lv_group_create()`,
      *add objects to the group with `lv_group_add_obj(group, obj)`
@@ -165,8 +192,8 @@ void lv_port_indev_init(void)
 
     /*Assign buttons to points on the screen*/
     static const lv_point_t btn_points[2] = {
-        {10, 10},   /*Button 0 -> x:10; y:10*/
-        {40, 100},  /*Button 1 -> x:40; y:100*/
+        {140, 11.5}, /*Button 1 -> x:140; y:11.5*/
+        {140, 65.5}, /*Button 2 -> x:140; y:65.5*/
     };
     lv_indev_set_button_points(indev_button, btn_points);
 }
@@ -178,7 +205,7 @@ void lv_port_indev_init(void)
 /*------------------
  * Touchpad
  * -----------------*/
-
+#if 0
 /*Initialize your touchpad*/
 static void touchpad_init(void)
 {
@@ -222,10 +249,13 @@ static void touchpad_get_xy(lv_coord_t * x, lv_coord_t * y)
     (*y) = 0;
 }
 
+#endif
+
 /*------------------
  * Mouse
  * -----------------*/
 
+#if 0
 /*Initialize your mouse*/
 static void mouse_init(void)
 {
@@ -264,9 +294,13 @@ static void mouse_get_xy(lv_coord_t * x, lv_coord_t * y)
     (*y) = 0;
 }
 
+#endif /*Enable this file at the top*/
+
 /*------------------
  * Keypad
  * -----------------*/
+
+#if 0
 
 /*Initialize your keypad*/
 static void keypad_init(void)
@@ -323,9 +357,12 @@ static uint32_t keypad_get_key(void)
     return 0;
 }
 
-/*------------------
- * Encoder
- * -----------------*/
+#endif /*Enable this file at the top*/
+       /*------------------
+        * Encoder
+        * -----------------*/
+
+#if 0
 
 /*Initialize your keypad*/
 static void encoder_init(void)
@@ -350,6 +387,8 @@ static void encoder_handler(void)
     encoder_state = LV_INDEV_STATE_REL;
 }
 
+#endif /*Enable this file at the top*/
+
 /*------------------
  * Button
  * -----------------*/
@@ -361,29 +400,58 @@ static void button_init(void)
 }
 
 /*Will be called by the library to read the button*/
-static void button_read(lv_indev_drv_t * indev_drv, lv_indev_data_t * data)
+/**
+ * 按钮读取函数，用于更新输入设备的状态和按钮ID。
+ * 此函数在LVGL输入设备驱动中用作读回调函数，检测按钮按下状态并更新相应的输入设备数据。
+ *
+ * @param indev_drv 输入设备驱动结构体，包含驱动配置和回调函数。
+ * @param data 输入设备数据结构体，用于存储输入设备的状态和按钮ID。
+ */
+static void button_read(lv_indev_drv_t *indev_drv, lv_indev_data_t *data)
 {
-
+    // 静态变量，用于保存上一次按下的按钮ID
     static uint8_t last_btn = 0;
 
-    /*Get the pressed button's ID*/
+    /* 获取当前按下的按钮ID */
     int8_t btn_act = button_get_pressed_id();
 
-    if(btn_act >= 0) {
-        data->state = LV_INDEV_STATE_PR;
-        last_btn = btn_act;
+    // 如果有按钮被按下（按钮ID >= 0），更新输入设备状态为按下（Pressed）
+    if (btn_act >= 0)
+    {
+        data->state = LV_INDEV_STATE_PR; // 设置状态为按下
+        last_btn = btn_act;              // 记录当前按下的按钮ID
     }
-    else {
-        data->state = LV_INDEV_STATE_REL;
+    // 如果没有按钮被按下（按钮ID < 0），更新输入设备状态为释放（Released）
+    else
+    {
+        data->state = LV_INDEV_STATE_REL; // 设置状态为释放
     }
 
-    /*Save the last pressed button's ID*/
+    /* 保存最后一个按下的按钮ID到输入设备数据结构体中 */
     data->btn_id = last_btn;
 }
 
 /*Get ID  (0, 1, 2 ..) of the pressed button*/
 static int8_t button_get_pressed_id(void)
 {
+
+    if (button_status.button1_status == 1)
+    {
+        HAL_GPIO_TogglePin(LED_B_GPIO_Port, LED_B_Pin); // 切换 LED 状态
+        log_a("Button 1 Pressed");
+
+        button_status.button1_status = 0;
+        return 0;
+    }
+    else if (button_status.button2_status == 1)
+    {
+        log_a("Button 2 Pressed");
+        button_status.button2_status = 0;
+        return 1;
+    }
+
+#if 0
+
     uint8_t i;
 
     /*Check to buttons see which is being pressed (assume there are 2 buttons)*/
@@ -394,6 +462,8 @@ static int8_t button_get_pressed_id(void)
         }
     }
 
+#endif
+
     /*No button pressed*/
     return -1;
 }
@@ -401,12 +471,18 @@ static int8_t button_get_pressed_id(void)
 /*Test if `id` button is pressed or not*/
 static bool button_is_pressed(uint8_t id)
 {
+    // // 根据按键 ID 返回对应的按键状态
+    // if (id == 0 && button_status.button1_status == 1) {
+    //     button_status.button1_status = 0; // 检测到按键按下后清零状态
+    //     HAL_GPIO_TogglePin(LED_B_GPIO_Port, LED_B_Pin); // 切换 LED 状态
+    //     return true; // 按键1被按下
+    // } else if (id == 1 && button_status.button2_status == 1) {
+    //     button_status.button2_status = 0; // 检测到按键按下后清零状态
+    //     return true; // 按键2被按下
+    // }
 
-    /*Your code comes here*/
-
-    return false;
+    return false; // 未知按键 ID 或按键未按下
 }
-
 #else /*Enable this file at the top*/
 
 /*This dummy typedef exists purely to silence -Wpedantic.*/

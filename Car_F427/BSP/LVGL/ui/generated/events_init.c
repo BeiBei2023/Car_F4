@@ -16,6 +16,44 @@
 #endif
 
 
+static void main_btn_1_event_handler (lv_event_t *e)
+{
+    lv_event_code_t code = lv_event_get_code(e);
+    switch (code) {
+    case LV_EVENT_CLICKED:
+    {
+        ui_load_scr_animation(&guider_ui, &guider_ui.Voltage, guider_ui.Voltage_del, &guider_ui.main_del, setup_scr_Voltage, LV_SCR_LOAD_ANIM_NONE, 200, 200, true, true);
+        break;
+    }
+    default:
+        break;
+    }
+}
+
+void events_init_main (lv_ui *ui)
+{
+    lv_obj_add_event_cb(ui->main_btn_1, main_btn_1_event_handler, LV_EVENT_ALL, ui);
+}
+
+static void Voltage_btn_2_event_handler (lv_event_t *e)
+{
+    lv_event_code_t code = lv_event_get_code(e);
+    switch (code) {
+    case LV_EVENT_CLICKED:
+    {
+        ui_load_scr_animation(&guider_ui, &guider_ui.main, guider_ui.main_del, &guider_ui.Voltage_del, setup_scr_main, LV_SCR_LOAD_ANIM_NONE, 200, 200, true, true);
+        break;
+    }
+    default:
+        break;
+    }
+}
+
+void events_init_Voltage (lv_ui *ui)
+{
+    lv_obj_add_event_cb(ui->Voltage_btn_2, Voltage_btn_2_event_handler, LV_EVENT_ALL, ui);
+}
+
 
 void events_init(lv_ui *ui)
 {

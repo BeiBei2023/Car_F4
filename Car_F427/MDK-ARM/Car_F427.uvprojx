@@ -2210,6 +2210,36 @@
               <FilePath>..\BSP\LVGL\ui\custom\custom.c</FilePath>
             </File>
             <File>
+              <FileName>lv_font_montserratMedium_12.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\BSP\LVGL\ui\generated\guider_fonts\lv_font_montserratMedium_12.c</FilePath>
+            </File>
+            <File>
+              <FileName>lv_font_montserratMedium_16.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\BSP\LVGL\ui\generated\guider_fonts\lv_font_montserratMedium_16.c</FilePath>
+            </File>
+            <File>
+              <FileName>lv_font_SourceHanSerifSC_Regular_8.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\BSP\LVGL\ui\generated\guider_fonts\lv_font_SourceHanSerifSC_Regular_8.c</FilePath>
+            </File>
+            <File>
+              <FileName>lv_font_SourceHanSerifSC_Regular_9.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\BSP\LVGL\ui\generated\guider_fonts\lv_font_SourceHanSerifSC_Regular_9.c</FilePath>
+            </File>
+            <File>
+              <FileName>lv_font_SourceHanSerifSC_Regular_16.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\BSP\LVGL\ui\generated\guider_fonts\lv_font_SourceHanSerifSC_Regular_16.c</FilePath>
+            </File>
+            <File>
+              <FileName>_555_alpha_160x80.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\BSP\LVGL\ui\generated\images\_555_alpha_160x80.c</FilePath>
+            </File>
+            <File>
               <FileName>events_init.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\BSP\LVGL\ui\generated\events_init.c</FilePath>
@@ -2220,19 +2250,19 @@
               <FilePath>..\BSP\LVGL\ui\generated\gui_guider.c</FilePath>
             </File>
             <File>
-              <FileName>setup_scr_screen.c</FileName>
+              <FileName>setup_scr_main.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\BSP\LVGL\ui\generated\setup_scr_screen.c</FilePath>
+              <FilePath>..\BSP\LVGL\ui\generated\setup_scr_main.c</FilePath>
+            </File>
+            <File>
+              <FileName>setup_scr_Voltage.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\BSP\LVGL\ui\generated\setup_scr_Voltage.c</FilePath>
             </File>
             <File>
               <FileName>widgets_init.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\BSP\LVGL\ui\generated\widgets_init.c</FilePath>
-            </File>
-            <File>
-              <FileName>_555_alpha_160x80.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\BSP\LVGL\ui\generated\images\_555_alpha_160x80.c</FilePath>
             </File>
           </Files>
         </Group>

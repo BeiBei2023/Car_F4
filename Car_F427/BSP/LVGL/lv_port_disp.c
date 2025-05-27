@@ -188,11 +188,12 @@ static void disp_flush(lv_disp_drv_t *disp_drv, const lv_area_t *area, lv_color_
                 /*Put a pixel to the display. For example:*/
                 /*put_px(x, y, *color_p)*/
                 ST7735_DrawPixel(x, y, color_p->full);
+
                 color_p++;
             }
         }
 
-    //    ST7735_FillRectangleFast(area->x1, area->y1, area->x2, area->y2, color_p->full);
+        //ST7735_FillRectangle(area->x1, area->y1, area->x2, area->y2, color_p->full);
     }
 
     /*IMPORTANT!!!

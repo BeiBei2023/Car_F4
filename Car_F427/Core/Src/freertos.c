@@ -27,6 +27,7 @@
 /* USER CODE BEGIN Includes */
 #include "sever_init.h"
 #include "lv_port_disp.h"
+#include "lv_port_indev.h"
 #include "lv_demo_widgets.h"
 #include "UARTCallback.h"
 #include "elog.h"
@@ -194,7 +195,9 @@ void StartDefaultTask(void *argument)
     osDelay(100);        // 延时100ms，等待LVGL初始化完成
     lv_port_disp_init(); // 显示初始化
     log_i("lv_port_disp_init");
-    osDelay(1000); // 延时100ms，等待显示初始化完成
+    lv_port_indev_init(); // 输入设备初始化
+    log_i("lv_port_indev_init");
+    osDelay(100); // 延时100ms，等待显示初始化完成
 
     log_i("ui_init");
     setup_ui(&guider_ui);

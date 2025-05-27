@@ -4,21 +4,18 @@
 #include "multi_button.h"
 #include "main.h"
 
-//按键ID
+// 按键ID
 #define button1_id 0
+#define button2_id 1
 
+// 结构体，存放按键的状态
 typedef struct
 {
-    uint8_t button_count;
-    uint8_t button_flage;
-} button_get;
+    uint8_t button1_status; // 按键1状态
+    uint8_t button2_status; // 按键2状态
+} Button_status;
+extern Button_status button_status; // 按键状态结构体
 
-extern button_get but_cnt ;
-
-
-
-
-uint8_t read_button1_GPIO();
 void Callback_SINGLE_CLICK_Handler(void *btn);
 void Callback_DOUBLE_Click_Handler(void *btn);
 void Button_Init();

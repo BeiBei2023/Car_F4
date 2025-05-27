@@ -9,115 +9,106 @@
 > "Car_F4\Car_F427\BSP\ST7735S\st7735s.c"  
 > "Car_F4\Car_F427\BSP\ST7735S\st7735s.h"
 
-有两个文件是页面管理的程序，主要用来实现页面切换并且显示不同的内容的，这两个文件是：
-
-> "Car_F4\Car_F427\BSP\ST7735S\screen_manager.c"  
-> "Car_F4\Car_F427\BSP\ST7735S\screen_manager.h"
-
-新的界面和文字主要在这两个文件中添加:
-
-> "Car_F4\Car_F427\BSP\ST7735S\screen_config.c"  
-> "Car_F4\Car_F427\BSP\ST7735S\screen_config.h"
-
-具体的用法是这样的：
-
-在 screen_config.h 中添加如下代码，作用分别为:
-
-首先是**添加一个页面的显示的文字**，使用这个代码
-
-```c
-TextRegion voltage_regions[] = {
-    {31, 43, &Font_16x26, ST7735_BLACK, ST7735_WHITE, ""} // 电压显示区域
-};
-TextRegion temp_regions[] = {
-    {9, 55, &Font_11x18, ST7735_BLACK, ST7735_WHITE, ""}, // 温度
-    {91, 55, &Font_11x18, ST7735_BLACK, ST7735_WHITE, ""} // 湿度
-};
-```
-
-TextRegion 是是一个结构体，用来描述文字显示的位置，字体，颜色，以及显示的文字。其`voltage_regions`是一个数组，用来描述显示的文字的区域，字体，字体颜色，背景颜色和具体显示的数值的空的数组。
-
-接下来是**配置显示的界面的信息**，示例代码如下：
-
-```c
-/**** 界面配置 ****/
-ScreenConfig screens[] = {
-    {// 电压界面
-     .bg_image = gImage_dianya,
-     .bg_width = 160,
-     .bg_height = 80,
-     .regions = voltage_regions,
-     .region_count = 1},
-    {// 温湿度界面
-     .bg_image = gImage_wenshidu,
-     .bg_width = 160,
-     .bg_height = 80,
-     .regions = temp_regions,
-     .region_count = 2}};
-```
-
-这是创建了这个数组`screens`，在其中来创建我们现实的界面。填入的参数是`gImage_dianya`、`gImage_wenshidu`，分别对应了 voltage_regions 和 temp_regions 这两个数组。 然后，`bg_image`就是填入经过取模软件处理过的图片，`bg_width`和`bg_height`就是图片的宽高，`regions`就是上面定义的两个数组，`region_count`就是数组的长度（界面中要显示的文本或者数值的数量）。
-
-最重要的是**声明一个全局变量**，可在全局调用屏幕显示
-
-```c
-/**** 全局管理器实例 ****/
-ScreenManager screen_mgr;
-```
-
-不要忘记在头文件中声明刚才创建好的函数。比如：
-
-```c
-// 声明为外部可访问的全局配置
-extern TextRegion voltage_regions[];    // 电压显示区域
-extern TextRegion temp_regions[];       // 温度显示区域
-extern ScreenConfig screens[];           // 屏幕配置
-extern ScreenManager screen_mgr;        // 屏幕管理器
-```
-
-在文件 main.c 中，初始化相关函数，当然是要初始化屏幕，然后初始化屏幕的管理的函数。
-
-```c
-// 初始化界面管理器
-ScreenManager_Init(&screen_mgr, screens, 2);    // 初始化屏幕管理器,两个界面
-ScreenManager_Switch(&screen_mgr, 0);  // 上电时就切换到第一个界面
-```
-
-在使用屏幕管理器时，你需要在合适的时机调用`ScreenManager_UpdateRegion(ScreenManager *mgr, uint8_t region_id, const char *new_str)`函数来更新屏幕。这个函数会根据当前的界面状态，选择正确的界面进行更新。但别忘了，这个的前提是要选择某个界面，否则会报错，使用`ScreenManager_Switch(ScreenManager *mgr, uint8_t screen_id)`来选择某个界面。
-
-以下轮播的示例程序：
-
-```c
-for (int i = 0; i < 2; i++)
-{
-    screen_mgr.current_screen = i;
-    ;
-    // 电压界面更新
-    if (screen_mgr.current_screen == 0)
-    {
-        ScreenManager_Switch(&screen_mgr, 0);
-        char buf[20];
-        snprintf(buf, sizeof(buf), "%.2f", adc_v.v_in);
-        ScreenManager_UpdateRegion(&screen_mgr, 0, buf);
-    }
-    else if (screen_mgr.current_screen == 1)
-    {
-        ScreenManager_Switch(&screen_mgr, 1);
-        float temp = sensorData.Temperature;
-        float humidity = sensorData.Humidity;
-
-        char temp_str[20];
-        snprintf(temp_str, sizeof(temp_str), "%.1f", temp);
-        ScreenManager_UpdateRegion(&screen_mgr, 0, temp_str);
-
-        char hum_str[20];
-        snprintf(hum_str, sizeof(hum_str), "%.1f", humidity);
-        ScreenManager_UpdateRegion(&screen_mgr, 1, hum_str);
-    }
-    vTaskDelay(pdMS_TO_TICKS(2000)); // 200ms检测周期
-}
-```
-
 ### 按键驱动
 
 驱动来源 `https://github.com/0x1abin/MultiButton`
+
+使用的详细教程，参考博客
+
+> > [多按键驱动](<[https://blog.csdn.net/zhang062061/article/details/124358360](https://blog.csdn.net/zhang062061/article/details/124358360)>)
+
+我创建了一个结构体存放按键状态，以供 LVGL 使用
+
+```C
+button_status.button2_status = 1; // 按键2单击状态设置为1
+```
+
+### LVGL 的函数
+
+版本：8.3.11
+
+LVGL 是一个开源的图形库，用于在嵌入式设备上创建用户界面。它提供了一组函数，用于创建和操作图形元素，如按钮、滑块、标签等。以下是一些常用的 LVGL 函数：
+
+我是用的 NXP 的 GUI Guider 工具，生成了代码，然后把代码复制到项目中。具体使用不记录了
+
+#### 要将按键绑定到 LVGL 的按钮上
+
+Button 属于独立按键而KeyPad属于组合按键。
+
+参考博客：
+
+> > [LVGL-GUI Guider 按键绑定](<[https://blog.csdn.net/chenaiguo0503/article/details/131287451](https://blog.csdn.net/chenaiguo0503/article/details/131287451)>)
+
+在文件 lv_port_indev.c 中添加如下代码：
+
+```c
+static int8_t button_get_pressed_id(void)
+{
+
+
+    if (button_status.button1_status == 1)
+    {
+        return 0;
+    }
+    else if (button_status.button2_status == 1)
+    {
+        return 1;
+    }
+
+
+    #if 0
+
+    uint8_t i;
+
+    /*Check to buttons see which is being pressed (assume there are 2 buttons)*/
+    for(i = 0; i < 2; i++) {
+        /*Return the pressed button's ID*/
+        if(button_is_pressed(i)) {
+            return i;
+        }
+    }
+
+    #endif
+
+    /*No button pressed*/
+    return -1;
+}
+```
+
+这个的前提是要包含`button_config.h`头文件，并初始化`button_status`结构体。
+这个函数首先检查`button_status`结构体的`button1_status`成员变量，如果为 1，则返回 0，表示第一个按钮被按下。如果`button_status`结构体的`button2_status`成员变量为 1，则返回 1，表示第二个按钮被按下。
+
+#### 创建按钮控件
+
+教程：
+
+> [创建按钮控件](<[text](https://blog.csdn.net/m0_55986987/article/details/133032918)>)
+
+对教程的补充：版本变化了，所以位置变化了
+
+设置完如图所示：
+
+![按钮控件事件设置](./PIC/按钮跳转屏幕事件设置.jpg)
+
+在LVGL中，物理按键对接软件的按键，可参考这个教程：
+> [LVGL物理按键对接软件按键]([https://blog.csdn.net/m0_55986987/article/details/133032918](https://blog.csdn.net/jf_52001760/article/details/123065523))
+
+将按键的按下坐标对应软件坐标的中间坐标
+
+如图所示计算：
+
+![物理按键对接软件按键](./PIC/按键位置计算.jpg)
+
+因此，按照这个计算得出两个实体按键对应的坐标，在接着改变程序。在LVGL中，按键的坐标设置如下：
+
+在lv_port_indev.c 中修改：
+
+```c
+    /*Assign buttons to points on the screen*/
+    static const lv_point_t btn_points[2] = {
+        {140, 11.5},   /*Button 1 -> x:140; y:11.5*/
+        {140, 65.5},  /*Button 2 -> x:140; y:65.5*/
+    };
+```
+
+不要忘记初始化这外设输入！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！
