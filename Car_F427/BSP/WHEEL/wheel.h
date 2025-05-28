@@ -54,7 +54,7 @@ extern osMutexId_t mutexHandle;
 
 
 void task_remote_attr(void *argument);
-void task_led_attr(void *argument);
+void lvgl_tick_attr(void *argument);
 void target_speed_conversion(float Vx, float Vy, float Omega, uint8_t mSpeedGear);
 
 

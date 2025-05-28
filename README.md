@@ -33,7 +33,7 @@ LVGL 是一个开源的图形库，用于在嵌入式设备上创建用户界面
 
 #### 要将按键绑定到 LVGL 的按钮上
 
-Button 属于独立按键而KeyPad属于组合按键。
+Button 属于独立按键而 KeyPad 属于组合按键。
 
 参考博客：
 
@@ -90,8 +90,9 @@ static int8_t button_get_pressed_id(void)
 
 ![按钮控件事件设置](./PIC/按钮跳转屏幕事件设置.jpg)
 
-在LVGL中，物理按键对接软件的按键，可参考这个教程：
-> [LVGL物理按键对接软件按键]([https://blog.csdn.net/m0_55986987/article/details/133032918](https://blog.csdn.net/jf_52001760/article/details/123065523))
+在 LVGL 中，物理按键对接软件的按键，可参考这个教程：
+
+> [LVGL 物理按键对接软件按键](<[https://blog.csdn.net/m0_55986987/article/details/133032918](https://blog.csdn.net/jf_52001760/article/details/123065523)>)
 
 将按键的按下坐标对应软件坐标的中间坐标
 
@@ -99,9 +100,9 @@ static int8_t button_get_pressed_id(void)
 
 ![物理按键对接软件按键](./PIC/按键位置计算.jpg)
 
-因此，按照这个计算得出两个实体按键对应的坐标，在接着改变程序。在LVGL中，按键的坐标设置如下：
+因此，按照这个计算得出两个实体按键对应的坐标，在接着改变程序。在 LVGL 中，按键的坐标设置如下：
 
-在lv_port_indev.c 中修改：
+在 lv_port_indev.c 中修改：
 
 ```c
     /*Assign buttons to points on the screen*/
@@ -112,3 +113,8 @@ static int8_t button_get_pressed_id(void)
 ```
 
 不要忘记初始化这外设输入！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！
+
+#### 效果
+
+看这个图片
+![UI效果](./PIC/UI效果.jpg)

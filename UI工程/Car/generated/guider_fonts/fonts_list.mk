@@ -1,0 +1,1 @@
+GEN_CSRCS += lv_font_yousheTittle_30.c lv_font_montserratMedium_16.c lv_font_montserratMedium_12.c lv_font_SourceHanSerifSC_Regular_16.c lv_font_yousheTittle_35.c lv_font_SourceHanSerifSC_Regular_11.c lv_font_yousheTittle_16.c

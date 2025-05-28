@@ -1,0 +1,1 @@
+GEN_CSRCS += _555_alpha_160x80.c

@@ -20,6 +20,9 @@ void events_init(lv_ui *ui);
 
 void events_init_main(lv_ui *ui);
 void events_init_Voltage(lv_ui *ui);
+void events_init_Temperature(lv_ui *ui);
+void events_init_Humidity(lv_ui *ui);
+void events_init_IO_State(lv_ui *ui);
 
 #ifdef __cplusplus
 }

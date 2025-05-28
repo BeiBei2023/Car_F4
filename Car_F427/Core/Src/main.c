@@ -40,8 +40,6 @@
 #include "UARTCallback.h"
 #include "QMI8658A.h"
 
-
-
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -126,12 +124,10 @@ int main(void)
   HAL_TIM_Base_Start_IT(&htim3); // 使用中断模式启动TIM6
 
   Modbus_Init(0x01); // 初始化Modbus，设置从站地址为0x01
-                     // init(); // 初始化电机和PID
-                     // ST7735_Init();
+  // init(); // 初始化电机和PID
+  // ST7735_Init();
+  HAL_GPIO_WritePin(OUT3_GPIO_Port, OUT3_Pin, GPIO_PIN_SET); // 设置OUT3引脚为高电平
 
-
-
-	
   /* USER CODE END 2 */
 
   /* Init scheduler */
@@ -232,10 +228,8 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
   /* USER CODE BEGIN Callback 1 */
   if (htim->Instance == TIM3)
   {
-    // HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_5); // Toggle the LED on pin PA5
-    // HAL_ADC_Start_IT(&hadc1); // Start ADC conversion
+
     lv_tick_inc(1); // LVGL tick increment
-   // ui_tick(); // LVGL UI tick
   }
 
   /* USER CODE END Callback 1 */

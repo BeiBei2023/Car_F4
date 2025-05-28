@@ -354,21 +354,6 @@
                 "path": "../BSP/LVGL/ui/custom/custom.c"
               },
               {
-                "path": "../BSP/LVGL/ui/generated/guider_fonts/lv_font_montserratMedium_12.c"
-              },
-              {
-                "path": "../BSP/LVGL/ui/generated/guider_fonts/lv_font_montserratMedium_16.c"
-              },
-              {
-                "path": "../BSP/LVGL/ui/generated/guider_fonts/lv_font_SourceHanSerifSC_Regular_8.c"
-              },
-              {
-                "path": "../BSP/LVGL/ui/generated/guider_fonts/lv_font_SourceHanSerifSC_Regular_9.c"
-              },
-              {
-                "path": "../BSP/LVGL/ui/generated/guider_fonts/lv_font_SourceHanSerifSC_Regular_16.c"
-              },
-              {
                 "path": "../BSP/LVGL/ui/generated/images/_555_alpha_160x80.c"
               },
               {
@@ -385,6 +370,39 @@
               },
               {
                 "path": "../BSP/LVGL/ui/generated/widgets_init.c"
+              },
+              {
+                "path": "../BSP/LVGL/ui/generated/guider_fonts/lv_font_yousheTittle_30.c"
+              },
+              {
+                "path": "../BSP/LVGL/ui/generated/guider_fonts/lv_font_yousheTittle_35.c"
+              },
+              {
+                "path": "../BSP/LVGL/ui/generated/setup_scr_Temperature.c"
+              },
+              {
+                "path": "../BSP/LVGL/ui/generated/setup_scr_Humidity.c"
+              },
+              {
+                "path": "../BSP/LVGL/ui/generated/guider_fonts/lv_font_Acme_Regular_35.c"
+              },
+              {
+                "path": "../BSP/LVGL/ui/generated/guider_fonts/lv_font_montserratMedium_12.c"
+              },
+              {
+                "path": "../BSP/LVGL/ui/generated/guider_fonts/lv_font_montserratMedium_16.c"
+              },
+              {
+                "path": "../BSP/LVGL/ui/generated/guider_fonts/lv_font_SourceHanSerifSC_Regular_11.c"
+              },
+              {
+                "path": "../BSP/LVGL/ui/generated/guider_fonts/lv_font_SourceHanSerifSC_Regular_16.c"
+              },
+              {
+                "path": "../BSP/LVGL/ui/generated/setup_scr_IO_State.c"
+              },
+              {
+                "path": "../BSP/LVGL/ui/generated/guider_fonts/lv_font_yousheTittle_16.c"
               }
             ],
             "folders": []

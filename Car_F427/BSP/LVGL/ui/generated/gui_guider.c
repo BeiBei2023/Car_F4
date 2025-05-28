@@ -77,6 +77,9 @@ void init_scr_del_flag(lv_ui *ui)
 
     ui->main_del = true;
     ui->Voltage_del = true;
+    ui->Temperature_del = true;
+    ui->Humidity_del = true;
+    ui->IO_State_del = true;
 }
 
 void setup_ui(lv_ui *ui)

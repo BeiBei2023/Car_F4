@@ -8,6 +8,9 @@
 #include "stdio.h"
 #include <stdint.h>
 
+#include "custom.h"  // 确保能访问current_voltage
+
+
 extern ADC_HandleTypeDef hadc1;
 
 /**

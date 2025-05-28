@@ -6,6 +6,6 @@
 
 #include "motor.h"
 
-void send_motor_data_task(void *argument);
+void button_task(void *argument);
 
 #endif // !__SEND_MOTOR_DATA_H_
