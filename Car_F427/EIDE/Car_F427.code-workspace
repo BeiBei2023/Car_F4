@@ -9,7 +9,14 @@
       "gui_guider.h": "c",
       "lvgl.h": "c",
       "stdio.h": "c",
-      "custom.h": "c"
+      "custom.h": "c",
+      "wheel.h": "c",
+      "cmsis_os.h": "c",
+      "widgets_init.h": "c",
+      "qmi8658a.h": "c",
+      "events_init.h": "c",
+      "usart.h": "c",
+      "stm32f4xx_it.h": "c"
     }
   },
   "extensions": {}

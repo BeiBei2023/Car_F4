@@ -24,31 +24,12 @@ void setup_scr_Voltage(lv_ui *ui)
     lv_obj_set_scrollbar_mode(ui->Voltage, LV_SCROLLBAR_MODE_OFF);
 
     //Write style for Voltage, Part: LV_PART_MAIN, State: LV_STATE_DEFAULT.
-    lv_obj_set_style_bg_opa(ui->Voltage, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
-
-    //Write codes Voltage_cont_1
-    ui->Voltage_cont_1 = lv_obj_create(ui->Voltage);
-    lv_obj_set_pos(ui->Voltage_cont_1, 0, 0);
-    lv_obj_set_size(ui->Voltage_cont_1, 160, 80);
-    lv_obj_set_scrollbar_mode(ui->Voltage_cont_1, LV_SCROLLBAR_MODE_OFF);
-
-    //Write style for Voltage_cont_1, Part: LV_PART_MAIN, State: LV_STATE_DEFAULT.
-    lv_obj_set_style_border_width(ui->Voltage_cont_1, 2, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_border_opa(ui->Voltage_cont_1, 255, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_border_color(ui->Voltage_cont_1, lv_color_hex(0xffffff), LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_border_side(ui->Voltage_cont_1, LV_BORDER_SIDE_FULL, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_radius(ui->Voltage_cont_1, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_bg_opa(ui->Voltage_cont_1, 255, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_bg_color(ui->Voltage_cont_1, lv_color_hex(0xffffff), LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_bg_grad_dir(ui->Voltage_cont_1, LV_GRAD_DIR_NONE, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_pad_top(ui->Voltage_cont_1, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_pad_bottom(ui->Voltage_cont_1, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_pad_left(ui->Voltage_cont_1, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_pad_right(ui->Voltage_cont_1, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_shadow_width(ui->Voltage_cont_1, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_opa(ui->Voltage, 255, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_color(ui->Voltage, lv_color_hex(0xffffff), LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_grad_dir(ui->Voltage, LV_GRAD_DIR_NONE, LV_PART_MAIN|LV_STATE_DEFAULT);
 
     //Write codes Voltage_btn_3
-    ui->Voltage_btn_3 = lv_btn_create(ui->Voltage_cont_1);
+    ui->Voltage_btn_3 = lv_btn_create(ui->Voltage);
     ui->Voltage_btn_3_label = lv_label_create(ui->Voltage_btn_3);
     lv_label_set_text(ui->Voltage_btn_3_label, "N");
     lv_label_set_long_mode(ui->Voltage_btn_3_label, LV_LABEL_LONG_WRAP);
@@ -75,7 +56,7 @@ void setup_scr_Voltage(lv_ui *ui)
     lv_obj_set_style_text_align(ui->Voltage_btn_3, LV_TEXT_ALIGN_CENTER, LV_PART_MAIN|LV_STATE_DEFAULT);
 
     //Write codes Voltage_btn_2
-    ui->Voltage_btn_2 = lv_btn_create(ui->Voltage_cont_1);
+    ui->Voltage_btn_2 = lv_btn_create(ui->Voltage);
     ui->Voltage_btn_2_label = lv_label_create(ui->Voltage_btn_2);
     lv_label_set_text(ui->Voltage_btn_2_label, "B");
     lv_label_set_long_mode(ui->Voltage_btn_2_label, LV_LABEL_LONG_WRAP);

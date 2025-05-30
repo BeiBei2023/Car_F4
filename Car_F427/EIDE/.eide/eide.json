@@ -384,9 +384,6 @@
                 "path": "../BSP/LVGL/ui/generated/setup_scr_Humidity.c"
               },
               {
-                "path": "../BSP/LVGL/ui/generated/guider_fonts/lv_font_Acme_Regular_35.c"
-              },
-              {
                 "path": "../BSP/LVGL/ui/generated/guider_fonts/lv_font_montserratMedium_12.c"
               },
               {
@@ -403,9 +400,40 @@
               },
               {
                 "path": "../BSP/LVGL/ui/generated/guider_fonts/lv_font_yousheTittle_16.c"
+              },
+              {
+                "path": "../BSP/LVGL/ui/generated/setup_scr_SBUS.c"
+              },
+              {
+                "path": "../BSP/LVGL/ui/generated/guider_fonts/lv_font_yousheTittle_13.c"
+              },
+              {
+                "path": "../BSP/LVGL/ui/generated/setup_scr_IMU.c"
+              },
+              {
+                "path": "../BSP/LVGL/ui/generated/setup_scr_CLOCK.c"
+              },
+              {
+                "path": "../BSP/LVGL/ui/generated/guider_fonts/lv_font_yousheTittle_24.c"
+              },
+              {
+                "path": "../BSP/LVGL/ui/generated/guider_fonts/lv_font_yousheTittle_22.c"
               }
             ],
-            "folders": []
+            "folders": [
+              {
+                "name": "DCLOCK",
+                "files": [
+                  {
+                    "path": "../BSP/LVGL/ui/dclock/lv_dclock.c"
+                  },
+                  {
+                    "path": "../BSP/LVGL/ui/dclock/lv_dclock.h"
+                  }
+                ],
+                "folders": []
+              }
+            ]
           },
           {
             "name": "CORE",
@@ -1288,7 +1316,8 @@
           "../BSP/LVGL/ui/generated/guider_customer_fonts",
           "../BSP/LVGL/ui/generated/guider_fonts",
           "../BSP/LVGL/ui/generated/images",
-          "../MDK-ARM/RTE/_Car_F427"
+          "../MDK-ARM/RTE/_Car_F427",
+          "../BSP/LVGL/ui/dclock"
         ],
         "libList": [],
         "defineList": [

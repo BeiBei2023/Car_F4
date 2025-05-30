@@ -86,7 +86,7 @@ void lv_port_disp_init(void)
      *      and you only need to change the frame buffer's address.
      */
 
-#if 1
+#if 0
     /* Example for 1) */
     static lv_disp_draw_buf_t draw_buf_dsc_1;
     static lv_color_t buf_1[MY_DISP_HOR_RES * 10];                             /*A buffer for 10 rows*/
@@ -94,7 +94,7 @@ void lv_port_disp_init(void)
 
 #endif
 
-#if 0
+#if 1
     /* Example for 2) */
     static lv_disp_draw_buf_t draw_buf_dsc_2;
     static lv_color_t buf_2_1[MY_DISP_HOR_RES * 10];                                /*A buffer for 10 rows*/
@@ -129,7 +129,7 @@ void lv_port_disp_init(void)
     disp_drv.flush_cb = disp_flush;
 
     /*Set a display buffer*/
-    disp_drv.draw_buf = &draw_buf_dsc_1;
+    disp_drv.draw_buf = &draw_buf_dsc_2;
 
     /*Required for Example 3)*/
     // disp_drv.full_refresh = 1;
@@ -193,13 +193,16 @@ static void disp_flush(lv_disp_drv_t *disp_drv, const lv_area_t *area, lv_color_
             }
         }
 
-        //ST7735_FillRectangle(area->x1, area->y1, area->x2, area->y2, color_p->full);
+        // ST7735_FillRectangleFast(area->x1, area->y1, area->x2, area->y2, color_p->full);
     }
 
     /*IMPORTANT!!!
      *Inform the graphics library that you are ready with the flushing*/
     lv_disp_flush_ready(disp_drv);
 }
+
+
+
 
 /*OPTIONAL: GPU INTERFACE*/
 

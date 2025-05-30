@@ -24,8 +24,6 @@ int fputc(int ch, FILE *f)
   return ch;
 }
 
-
-
 int fgetc(FILE *f)
 {
   uint8_t ch;
@@ -64,4 +62,17 @@ void USER_USART_INIT(void)
 
   __HAL_UART_ENABLE_IT(&huart1, UART_IT_IDLE);             // 用IDLE和中断接收
   HAL_UARTEx_ReceiveToIdle_DMA(&huart1, RcUartBuffer, 25); // 用IDLE和中断接收
+}
+
+// 串口接收错误中断回调函数
+void HAL_UART_ErrorCallback(UART_HandleTypeDef *huart)
+{
+  if (huart->Instance == USART6)
+  {
+    if (huart->ErrorCode == HAL_UART_ERROR_ORE)
+    {
+      __HAL_UART_ENABLE_IT(&huart3, UART_IT_IDLE);                  // 使能USART6接收中断
+      HAL_UARTEx_ReceiveToIdle_DMA(&huart3, USART6_RX_BUFFER, 256); // 重新开启接收
+    }
+  }
 }

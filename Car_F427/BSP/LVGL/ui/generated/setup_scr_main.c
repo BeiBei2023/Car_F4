@@ -24,7 +24,9 @@ void setup_scr_main(lv_ui *ui)
     lv_obj_set_scrollbar_mode(ui->main, LV_SCROLLBAR_MODE_OFF);
 
     //Write style for main, Part: LV_PART_MAIN, State: LV_STATE_DEFAULT.
-    lv_obj_set_style_bg_opa(ui->main, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_opa(ui->main, 255, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_color(ui->main, lv_color_hex(0xffffff), LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_grad_dir(ui->main, LV_GRAD_DIR_NONE, LV_PART_MAIN|LV_STATE_DEFAULT);
 
     //Write codes main_img_1
     ui->main_img_1 = lv_img_create(ui->main);
@@ -49,7 +51,7 @@ void setup_scr_main(lv_ui *ui)
     lv_obj_align(ui->main_btn_1_label, LV_ALIGN_CENTER, 0, 0);
     lv_obj_set_style_pad_all(ui->main_btn_1, 0, LV_STATE_DEFAULT);
     lv_obj_set_width(ui->main_btn_1_label, LV_PCT(100));
-    lv_obj_set_pos(ui->main_btn_1, 135, 0);
+    lv_obj_set_pos(ui->main_btn_1, 135, 1);
     lv_obj_set_size(ui->main_btn_1, 22, 35);
     lv_obj_add_flag(ui->main_btn_1, LV_OBJ_FLAG_CLICKABLE);
 

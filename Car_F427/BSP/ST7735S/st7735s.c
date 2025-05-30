@@ -2,8 +2,6 @@
 
 /* vim: set ai et ts=4 sw=4: */
 
-
-
 #define DELAY 0x80
 
 // based on Adafruit ST7735 library for Arduino
@@ -98,15 +96,14 @@ static void ST7735_WriteCommand(uint8_t cmd)
 {
   HAL_GPIO_WritePin(ST7735_DC_GPIO_Port, ST7735_DC_Pin, GPIO_PIN_RESET);
 
-  HAL_SPI_Transmit(&ST7735_SPI_PORT, &cmd, sizeof(cmd),HAL_MAX_DELAY);
-
+  HAL_SPI_Transmit(&ST7735_SPI_PORT, &cmd, sizeof(cmd), HAL_MAX_DELAY);
 }
 
 static void ST7735_WriteData(uint8_t *buff, size_t buff_size)
 {
   HAL_GPIO_WritePin(ST7735_DC_GPIO_Port, ST7735_DC_Pin, GPIO_PIN_SET);
 
-  HAL_SPI_Transmit(&ST7735_SPI_PORT, buff, buff_size,HAL_MAX_DELAY);
+  HAL_SPI_Transmit(&ST7735_SPI_PORT, buff, buff_size, HAL_MAX_DELAY);
 }
 
 static void ST7735_ExecuteCommandList(const uint8_t *addr)
@@ -142,10 +139,10 @@ static void ST7735_ExecuteCommandList(const uint8_t *addr)
 
 /**
  * 设置ST7735显示屏的地址窗口
- * 
+ *
  * 本函数通过发送特定的命令和数据到ST7735显示屏，来设置显示区域的地址窗口
  * 这包括设置列地址和行地址，并准备写入RAM
- * 
+ *
  * @param x0 显示窗口左上角的X坐标
  * @param y0 显示窗口左上角的Y坐标
  * @param x1 显示窗口右下角的X坐标
@@ -173,7 +170,7 @@ static void ST7735_SetAddressWindow(uint8_t x0, uint8_t y0, uint8_t x1, uint8_t 
 
 /**
  * @brief 初始化ST7735液晶显示器
- * 
+ *
  * 本函数执行ST7735液晶显示器的初始化步骤，包括复位、执行初始化命令列表，
  * 以及初始化完成后填充屏幕为黄色。这些操作确保了显示器能够正确配置并进入
  * 可显示状态。
@@ -182,22 +179,22 @@ void ST7735_Init()
 {
   // 选择ST7735设备，准备进行初始化
   ST7735_Select();
-  
+
   // 复位ST7735显示器，确保从一个已知的状态开始
   ST7735_Reset();
-  
+
   // 执行第一组初始化命令，配置显示器的基本设置
   ST7735_ExecuteCommandList(init_cmds1);
-  
+
   // 执行第二组初始化命令，进一步配置显示器的显示模式等
   ST7735_ExecuteCommandList(init_cmds2);
-  
+
   // 执行第三组初始化命令，完成显示器的初始化配置
   ST7735_ExecuteCommandList(init_cmds3);
-  
+
   // 取消选择ST7735设备，初始化命令执行完毕
   ST7735_Unselect();
-  
+
   // 初始化完成后，快速填充整个屏幕为黑色，作为初始化完成的标志
   ST7735_FillScreenFast(ST7735_RED);
 
@@ -206,12 +203,12 @@ void ST7735_Init()
 
 /**
  * 在ST7735液晶显示屏上绘制一个像素点。
- * 
+ *
  * 此函数通过接收x和y坐标以及颜色值来在指定位置绘制一个像素点。
  * 它首先检查给定的坐标是否超出了显示屏的边界，如果超出则直接返回。
  * 然后，它会选择显示屏，并设置绘制区域的窗口地址，接着发送颜色数据，
  * 最后取消选择显示屏。
- * 
+ *
  * @param x 横坐标，表示像素点在显示屏上的水平位置。
  * @param y 纵坐标，表示像素点在显示屏上的垂直位置。
  * @param color 像素点的颜色值，采用RGB565格式。
@@ -232,7 +229,11 @@ void ST7735_DrawPixel(uint16_t x, uint16_t y, uint16_t color)
   uint8_t data[] = {color >> 8, color & 0xFF};
 
   // 发送颜色数据到显示屏
-  ST7735_WriteData(data, sizeof(data));
+  //ST7735_WriteData(data, sizeof(data));
+
+  HAL_GPIO_WritePin(ST7735_DC_GPIO_Port, ST7735_DC_Pin, GPIO_PIN_SET);
+
+  HAL_SPI_Transmit_DMA(&ST7735_SPI_PORT, data, sizeof(data));
 
   // 取消选择显示屏，结束操作
   ST7735_Unselect();
@@ -248,7 +249,7 @@ void ST7735_DrawPixel(uint16_t x, uint16_t y, uint16_t color)
  * @param color 字符的颜色
  * @param bgcolor 背景颜色
  */
-static void ST7735_WriteChar(uint16_t x, uint16_t y, char ch, FontDef* font, uint16_t color, uint16_t bgcolor)
+static void ST7735_WriteChar(uint16_t x, uint16_t y, char ch, FontDef *font, uint16_t color, uint16_t bgcolor)
 {
   // 定义循环变量和临时变量
   uint32_t i, b, j;
@@ -298,7 +299,7 @@ static void ST7735_WriteChar(uint16_t x, uint16_t y, char ch, FontDef font, uint
 }
 */
 
-void ST7735_WriteString(uint16_t x, uint16_t y, const char *str, FontDef* font, uint16_t color, uint16_t bgcolor)
+void ST7735_WriteString(uint16_t x, uint16_t y, const char *str, FontDef *font, uint16_t color, uint16_t bgcolor)
 {
   ST7735_Select();
 
@@ -331,11 +332,11 @@ void ST7735_WriteString(uint16_t x, uint16_t y, const char *str, FontDef* font, 
 
 /**
  * 在ST7735显示屏上绘制填充矩形
- * 
+ *
  * 此函数通过指定的坐标、宽度、高度和颜色，在ST7735显示屏上绘制一个填充矩形
  * 它首先执行裁剪操作，以确保绘制的矩形不会超出显示屏的边界
  * 然后设置矩形的绘制区域，并通过SPI接口发送相应的像素数据
- * 
+ *
  * @param x 矩形左上角的x坐标
  * @param y 矩形左上角的y坐标
  * @param w 矩形的宽度
@@ -367,7 +368,7 @@ void ST7735_FillRectangle(uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint16
     for (x = w; x > 0; x--)
     {
 
-      HAL_SPI_Transmit(&ST7735_SPI_PORT, data, sizeof(data),HAL_MAX_DELAY);
+      HAL_SPI_Transmit(&ST7735_SPI_PORT, data, sizeof(data), HAL_MAX_DELAY);
     }
   }
 
@@ -399,7 +400,7 @@ void ST7735_FillRectangleFast(uint16_t x, uint16_t y, uint16_t w, uint16_t h, ui
   HAL_GPIO_WritePin(ST7735_DC_GPIO_Port, ST7735_DC_Pin, GPIO_PIN_SET);
   for (y = h; y > 0; y--)
 
-    HAL_SPI_Transmit(&ST7735_SPI_PORT, line, w * sizeof(pixel),HAL_MAX_DELAY);
+    HAL_SPI_Transmit_DMA(&ST7735_SPI_PORT, line, w * sizeof(pixel));
 
   free(line);
   ST7735_Unselect();
@@ -407,7 +408,7 @@ void ST7735_FillRectangleFast(uint16_t x, uint16_t y, uint16_t w, uint16_t h, ui
 
 /**
  * 填充整个屏幕为指定颜色。
- * 
+ *
  * @param color 要填充的颜色值。
  */
 void ST7735_FillScreen(uint16_t color)
@@ -418,10 +419,10 @@ void ST7735_FillScreen(uint16_t color)
 
 /**
  * ST7735_FillScreenFast函数
- * 
+ *
  * 使用指定的颜色填充整个屏幕。该函数通过调用ST7735_FillRectangleFast函数，
  * 设置填充区域为整个屏幕的宽度和高度来实现快速填充屏幕的效果。
- * 
+ *
  * @param color 填充屏幕所使用的颜色值。这是一个16位的颜色值，适用于ST7735显示屏。
  */
 void ST7735_FillScreenFast(uint16_t color)
@@ -433,11 +434,11 @@ void ST7735_FillScreenFast(uint16_t color)
 
 /**
  * 在ST7735液晶屏上绘制图像
- * 
+ *
  * 此函数将根据提供的参数和图像数据，在ST7735液晶屏的指定位置绘制图像
  * 它首先检查图像的绘制区域是否超出液晶屏的边界，如果超出，则直接返回
  * 如果未超出，它将选择液晶屏，设置图像绘制的窗口区域，然后写入图像数据
- * 
+ *
  * @param x 图像绘制区域的起始x坐标
  * @param y 图像绘制区域的起始y坐标
  * @param w 图像的宽度
@@ -473,40 +474,40 @@ void ST7735_DrawImage(uint16_t x, uint16_t y, uint16_t w, uint16_t h, const uint
 
 /**
  * ST7735_InvertColors函数用于控制ST7735显示屏的颜色反转功能。
- * 
+ *
  * @param invert 一个布尔值，决定是否反转显示屏的颜色。如果invert为true，颜色将反转；如果为false，颜色将保持正常。
  */
 void ST7735_InvertColors(bool invert)
 {
   // 选择ST7735显示屏以进行通信。
   ST7735_Select();
-  
+
   // 发送命令以反转或恢复正常显示颜色，具体取决于invert参数的值。
   ST7735_WriteCommand(invert ? ST7735_INVON : ST7735_INVOFF);
-  
+
   // 取消选择ST7735显示屏，结束通信。
   ST7735_Unselect();
 }
 
 /**
  * @brief 设置ST7735显示器的伽马曲线
- * 
+ *
  * 本函数通过选择合适的伽马曲线来调整显示器的颜色特性。伽马曲线影响显示器如何呈现颜色的深浅，
  * 对于不同的显示需求，可以选择不同的伽马曲线设置。
- * 
+ *
  * @param gamma 伽马曲线定义，指定要设置的伽马曲线
  */
 void ST7735_SetGamma(GammaDef gamma)
 {
   // 选择ST7735显示器以进行通信
   ST7735_Select();
-  
+
   // 发送伽马设置命令到ST7735显示器
   ST7735_WriteCommand(ST7735_GAMSET);
-  
+
   // 发送具体的伽马曲线数据到显示器
   ST7735_WriteData((uint8_t *)&gamma, sizeof(gamma));
-  
+
   // 通信完成后取消选择ST7735显示器
   ST7735_Unselect();
 }

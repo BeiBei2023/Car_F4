@@ -76,14 +76,14 @@ osThreadId_t ButtonScanTaskHandle;
 const osThreadAttr_t ButtonScanTask_attributes = {
   .name = "ButtonScanTask",
   .stack_size = 1024 * 4,
-  .priority = (osPriority_t) osPriorityBelowNormal,
+  .priority = (osPriority_t) osPriorityNormal2,
 };
 /* Definitions for Task_Remote */
 osThreadId_t Task_RemoteHandle;
 const osThreadAttr_t Task_Remote_attributes = {
   .name = "Task_Remote",
   .stack_size = 1024 * 4,
-  .priority = (osPriority_t) osPriorityHigh7,
+  .priority = (osPriority_t) osPriorityRealtime1,
 };
 /* Definitions for Task_LVGL */
 osThreadId_t Task_LVGLHandle;
@@ -97,20 +97,20 @@ osThreadId_t Modbus_DataHandle;
 const osThreadAttr_t Modbus_Data_attributes = {
   .name = "Modbus_Data",
   .stack_size = 1024 * 4,
-  .priority = (osPriority_t) osPriorityLow,
+  .priority = (osPriority_t) osPriorityNormal2,
 };
 /* Definitions for UI_DATA_TASK */
 osThreadId_t UI_DATA_TASKHandle;
 const osThreadAttr_t UI_DATA_TASK_attributes = {
   .name = "UI_DATA_TASK",
-  .stack_size = 1024 * 4,
-  .priority = (osPriority_t) osPriorityNormal,
+  .stack_size = 2048 * 4,
+  .priority = (osPriority_t) osPriorityNormal1,
 };
 /* Definitions for SensorDataTask */
 osThreadId_t SensorDataTaskHandle;
 const osThreadAttr_t SensorDataTask_attributes = {
   .name = "SensorDataTask",
-  .stack_size = 512 * 4,
+  .stack_size = 1024 * 4,
   .priority = (osPriority_t) osPriorityLow,
 };
 /* Definitions for mutex */

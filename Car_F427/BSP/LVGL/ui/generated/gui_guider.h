@@ -25,7 +25,6 @@ typedef struct
 	lv_obj_t *main_btn_1_label;
 	lv_obj_t *Voltage;
 	bool Voltage_del;
-	lv_obj_t *Voltage_cont_1;
 	lv_obj_t *Voltage_btn_3;
 	lv_obj_t *Voltage_btn_3_label;
 	lv_obj_t *Voltage_btn_2;
@@ -36,7 +35,6 @@ typedef struct
 	lv_obj_t *Voltage_label_3;
 	lv_obj_t *Temperature;
 	bool Temperature_del;
-	lv_obj_t *Temperature_cont_1;
 	lv_obj_t *Temperature_btn_5;
 	lv_obj_t *Temperature_btn_5_label;
 	lv_obj_t *Temperature_btn_4;
@@ -46,7 +44,6 @@ typedef struct
 	lv_obj_t *Temperature_temperature_label;
 	lv_obj_t *Humidity;
 	bool Humidity_del;
-	lv_obj_t *Humidity_cont_1;
 	lv_obj_t *Humidity_btn_7;
 	lv_obj_t *Humidity_btn_7_label;
 	lv_obj_t *Humidity_btn_6;
@@ -56,7 +53,6 @@ typedef struct
 	lv_obj_t *Humidity_humidity_label;
 	lv_obj_t *IO_State;
 	bool IO_State_del;
-	lv_obj_t *IO_State_cont_1;
 	lv_obj_t *IO_State_btn_9;
 	lv_obj_t *IO_State_btn_9_label;
 	lv_obj_t *IO_State_btn_8;
@@ -78,6 +74,47 @@ typedef struct
 	lv_obj_t *IO_State_label_6;
 	lv_obj_t *IO_State_label_7;
 	lv_obj_t *IO_State_label_8;
+	lv_obj_t *SBUS;
+	bool SBUS_del;
+	lv_obj_t *SBUS_btn_11;
+	lv_obj_t *SBUS_btn_11_label;
+	lv_obj_t *SBUS_btn_10;
+	lv_obj_t *SBUS_btn_10_label;
+	lv_obj_t *SBUS_cont_1;
+	lv_obj_t *SBUS_label_1;
+	lv_obj_t *SBUS_label_2;
+	lv_obj_t *SBUS_label_3;
+	lv_obj_t *SBUS_label_4;
+	lv_obj_t *SBUS_sbus_x_value;
+	lv_obj_t *SBUS_sbus_connect_led;
+	lv_obj_t *SBUS_sbus_y_value;
+	lv_obj_t *SBUS_sbus_w_value;
+	lv_obj_t *SBUS_sbus_work_led;
+	lv_obj_t *SBUS_label_5;
+	lv_obj_t *SBUS_label_6;
+	lv_obj_t *IMU;
+	bool IMU_del;
+	lv_obj_t *IMU_btn_11;
+	lv_obj_t *IMU_btn_11_label;
+	lv_obj_t *IMU_btn_10;
+	lv_obj_t *IMU_btn_10_label;
+	lv_obj_t *IMU_cont_1;
+	lv_obj_t *IMU_label_1;
+	lv_obj_t *IMU_label_2;
+	lv_obj_t *IMU_label_3;
+	lv_obj_t *IMU_label_4;
+	lv_obj_t *IMU_imu_x_value;
+	lv_obj_t *IMU_imu_y_value;
+	lv_obj_t *IMU_imu_z_value;
+	lv_obj_t *CLOCK;
+	bool CLOCK_del;
+	lv_obj_t *CLOCK_btn_11;
+	lv_obj_t *CLOCK_btn_11_label;
+	lv_obj_t *CLOCK_btn_10;
+	lv_obj_t *CLOCK_btn_10_label;
+	lv_obj_t *CLOCK_cont_1;
+	lv_obj_t *CLOCK_label_1;
+	lv_obj_t *CLOCK_digital_clock_1;
 }lv_ui;
 
 typedef void (*ui_setup_scr_t)(lv_ui * ui);
@@ -106,6 +143,9 @@ void setup_scr_Voltage(lv_ui *ui);
 void setup_scr_Temperature(lv_ui *ui);
 void setup_scr_Humidity(lv_ui *ui);
 void setup_scr_IO_State(lv_ui *ui);
+void setup_scr_SBUS(lv_ui *ui);
+void setup_scr_IMU(lv_ui *ui);
+void setup_scr_CLOCK(lv_ui *ui);
 LV_IMG_DECLARE(_555_alpha_160x80);
 
 LV_FONT_DECLARE(lv_font_yousheTittle_30)
@@ -115,6 +155,8 @@ LV_FONT_DECLARE(lv_font_SourceHanSerifSC_Regular_16)
 LV_FONT_DECLARE(lv_font_yousheTittle_35)
 LV_FONT_DECLARE(lv_font_SourceHanSerifSC_Regular_11)
 LV_FONT_DECLARE(lv_font_yousheTittle_16)
+LV_FONT_DECLARE(lv_font_yousheTittle_13)
+LV_FONT_DECLARE(lv_font_yousheTittle_22)
 
 
 #ifdef __cplusplus

@@ -118,3 +118,14 @@ static int8_t button_get_pressed_id(void)
 
 看这个图片
 ![UI效果](./PIC/UI效果.jpg)
+
+#### 时钟模块
+
+参考博客：
+[LVGL 时钟模块]([<\[https://blog.csdn.net/m0_55986987/article/details/133032918\](https://blog.csdn.net/jf_52001760/article/details/123065523)>](https://blog.csdn.net/qq_48211392/article/details/145586269))
+
+这个软件生成的，要自己在去安装目录添加
+路径是：
+> "D:\Program Files\NXP\GUI-Guider-1.9.1-GA\environment\template\project\v8\lvgl\src\extra\widgets\dclock"
+
+将这个两个文件在工程中包含。注意，再将lv_dclock.h加入到lvgl.h文件夹下

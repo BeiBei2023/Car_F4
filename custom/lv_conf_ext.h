@@ -1,5 +1,5 @@
 /*
-* Copyright 2025 NXP
+* Copyright 2023 NXP
 * NXP Proprietary. This software is owned or controlled by NXP and may only be used strictly in
 * accordance with the applicable license terms. By expressly accepting such terms or by downloading, installing,
 * activating and/or otherwise using the software, you are agreeing that you have read, and that you agree to
@@ -7,27 +7,36 @@
 * terms, then you may not retain, install, activate or otherwise use the software.
 */
 
+/*
+ * lv_conf_ext.h for custom lvconf file.
+ * Created on: Feb 8, 2023
+ * example :
+ *	#undef LV_FONT_FMT_TXT_LARGE
+ *  #define LV_FONT_FMT_TXT_LARGE 1
+ */
 
-#ifndef EVENTS_INIT_H_
-#define EVENTS_INIT_H_
-#ifdef __cplusplus
-extern "C" {
+#ifndef LV_CONF_EXT_H
+#define LV_CONF_EXT_H
+
+
+/* common code  begin  */
+
+
+/* common code end */
+
+
+#if LV_USE_GUIDER_SIMULATOR
+/* code for simulator begin  */
+
+
+/* code for simulator end */
+#else
+/* code for board begin */
+
+
+/* code for board end */	
 #endif
 
-#include "gui_guider.h"
 
-void events_init(lv_ui *ui);
 
-void events_init_main(lv_ui *ui);
-void events_init_Voltage(lv_ui *ui);
-void events_init_Temperature(lv_ui *ui);
-void events_init_Humidity(lv_ui *ui);
-void events_init_IO_State(lv_ui *ui);
-void events_init_SBUS(lv_ui *ui);
-void events_init_IMU(lv_ui *ui);
-void events_init_CLOCK(lv_ui *ui);
-
-#ifdef __cplusplus
-}
-#endif
-#endif /* EVENT_CB_H_ */
+#endif  /* LV_CONF_EXT_H */	

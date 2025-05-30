@@ -77,3 +77,16 @@ void clock_count(int *hour, int *min, int *sec)
 #endif
 
 
+extern int CLOCK_digital_clock_1_hour_value;
+extern int CLOCK_digital_clock_1_min_value;
+extern int CLOCK_digital_clock_1_sec_value;
+
+void CLOCK_digital_clock_1_timer(lv_timer_t *timer)
+{
+    clock_count_24(&CLOCK_digital_clock_1_hour_value, &CLOCK_digital_clock_1_min_value, &CLOCK_digital_clock_1_sec_value);
+    if (lv_obj_is_valid(guider_ui.CLOCK_digital_clock_1))
+    {
+        lv_dclock_set_text_fmt(guider_ui.CLOCK_digital_clock_1, "%d:%02d:%02d", CLOCK_digital_clock_1_hour_value, CLOCK_digital_clock_1_min_value, CLOCK_digital_clock_1_sec_value);
+    }
+}
+

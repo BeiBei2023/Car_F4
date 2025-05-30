@@ -8,6 +8,8 @@
 #include "screen_config.h"
 #include "elog.h"
 #include "QMI8658A.h"
+#include "sbus.h"
+
 
 void init(void)
 {
@@ -60,6 +62,13 @@ void init(void)
 
 
     QMI8658A_Init(); // 初始化QMI8658A传感器
+
+        //初始化通道值
+    sbus_ch_data.channels[0] = 1500; // 前后速度
+    sbus_ch_data.channels[1] = 1500; // 横向速度
+    sbus_ch_data.channels[3] = 1500; // 旋转速度
+
+    sbus_ch_data.flags = 4;
 
 
     log_i("all sever init ok");

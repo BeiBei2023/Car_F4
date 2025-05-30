@@ -30,21 +30,30 @@ void task_remote_attr(void *argument)
     const uint32_t task_period = 7;                 // 10ms周期（100Hz）
     TickType_t xLastWakeTime = xTaskGetTickCount(); // 记录上次执行时间
 
+    g_robot.x = 0.0f;
+    g_robot.y = 0.0f;
+    g_robot.w = 0.0f;
+
     g_robot.motor_rpm[0] = 0;
     g_robot.motor_rpm[1] = 0;
     g_robot.motor_rpm[2] = 0;
     g_robot.motor_rpm[3] = 0;
 
+
+
+
     for (;;)
     {
 
         // 归1
-        float x = ((float)sbus_ch_data.channels[SBUS_CH_VX] - 1500.0f) / 500.0f;
-        float y = ((float)sbus_ch_data.channels[SBUS_CH_VY] - 1500.0f) / 500.0f;
-        float w = ((float)sbus_ch_data.channels[SBUS_CH_OMEGA] - 1500.0f) / 500.0f;
+        g_robot.x = ((float)sbus_ch_data.channels[SBUS_CH_VX] - 1500.0f) / 500.0f;
+        g_robot.y = ((float)sbus_ch_data.channels[SBUS_CH_VY] - 1500.0f) / 500.0f;
+        g_robot.w = ((float)sbus_ch_data.channels[SBUS_CH_OMEGA] - 1500.0f) / 500.0f;
         uint16_t gear_value = sbus_ch_data.channels[SBUS_CH_GEAR];
 
-        target_speed_conversion(x, y, w, gear_value);
+
+
+        target_speed_conversion(g_robot.x, g_robot.y, g_robot.w, gear_value);
 
         vTaskDelayUntil(&xLastWakeTime, pdMS_TO_TICKS(task_period));
     }

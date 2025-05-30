@@ -24,31 +24,12 @@ void setup_scr_Humidity(lv_ui *ui)
     lv_obj_set_scrollbar_mode(ui->Humidity, LV_SCROLLBAR_MODE_OFF);
 
     //Write style for Humidity, Part: LV_PART_MAIN, State: LV_STATE_DEFAULT.
-    lv_obj_set_style_bg_opa(ui->Humidity, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
-
-    //Write codes Humidity_cont_1
-    ui->Humidity_cont_1 = lv_obj_create(ui->Humidity);
-    lv_obj_set_pos(ui->Humidity_cont_1, 0, 0);
-    lv_obj_set_size(ui->Humidity_cont_1, 160, 80);
-    lv_obj_set_scrollbar_mode(ui->Humidity_cont_1, LV_SCROLLBAR_MODE_OFF);
-
-    //Write style for Humidity_cont_1, Part: LV_PART_MAIN, State: LV_STATE_DEFAULT.
-    lv_obj_set_style_border_width(ui->Humidity_cont_1, 2, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_border_opa(ui->Humidity_cont_1, 255, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_border_color(ui->Humidity_cont_1, lv_color_hex(0xffffff), LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_border_side(ui->Humidity_cont_1, LV_BORDER_SIDE_FULL, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_radius(ui->Humidity_cont_1, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_bg_opa(ui->Humidity_cont_1, 255, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_bg_color(ui->Humidity_cont_1, lv_color_hex(0xffffff), LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_bg_grad_dir(ui->Humidity_cont_1, LV_GRAD_DIR_NONE, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_pad_top(ui->Humidity_cont_1, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_pad_bottom(ui->Humidity_cont_1, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_pad_left(ui->Humidity_cont_1, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_pad_right(ui->Humidity_cont_1, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_shadow_width(ui->Humidity_cont_1, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_opa(ui->Humidity, 255, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_color(ui->Humidity, lv_color_hex(0xffffff), LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_grad_dir(ui->Humidity, LV_GRAD_DIR_NONE, LV_PART_MAIN|LV_STATE_DEFAULT);
 
     //Write codes Humidity_btn_7
-    ui->Humidity_btn_7 = lv_btn_create(ui->Humidity_cont_1);
+    ui->Humidity_btn_7 = lv_btn_create(ui->Humidity);
     ui->Humidity_btn_7_label = lv_label_create(ui->Humidity_btn_7);
     lv_label_set_text(ui->Humidity_btn_7_label, "N");
     lv_label_set_long_mode(ui->Humidity_btn_7_label, LV_LABEL_LONG_WRAP);
@@ -75,7 +56,7 @@ void setup_scr_Humidity(lv_ui *ui)
     lv_obj_set_style_text_align(ui->Humidity_btn_7, LV_TEXT_ALIGN_CENTER, LV_PART_MAIN|LV_STATE_DEFAULT);
 
     //Write codes Humidity_btn_6
-    ui->Humidity_btn_6 = lv_btn_create(ui->Humidity_cont_1);
+    ui->Humidity_btn_6 = lv_btn_create(ui->Humidity);
     ui->Humidity_btn_6_label = lv_label_create(ui->Humidity_btn_6);
     lv_label_set_text(ui->Humidity_btn_6_label, "B");
     lv_label_set_long_mode(ui->Humidity_btn_6_label, LV_LABEL_LONG_WRAP);
