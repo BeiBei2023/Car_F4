@@ -9,6 +9,7 @@
 #include "Modbus.h"
 
 AHT20_Data_t modbus_sensorData;
+ModbusData Modbus; // 全局变量定义
 
 uint16_t HoldingRegisters[HOLDING_REGISTER_COUNT] = {0}; // 保持寄存器
 uint16_t InputRegisters[INPUT_REGISTER_COUNT] = {0};     // 输入寄存器
@@ -21,16 +22,32 @@ static void UpdateDiscreteInputsFromGPIO(void); // 更新离散输入状态
 static void UpdateInputRegisters(void);         // 更新输入寄存器
 static void UpdateHoldingRegisters(void);       // 更新保持寄存器
 
-void Modbus_Init(uint8_t device_address) // 可以设置设备地址
+/**
+ * @brief 初始化Modbus设备
+ *
+ * 该函数用于设置Modbus设备的地址，并选择使用的UART端口。
+ *
+ * @param device_address 设备的从站地址
+ * @param huart 指向UART_HandleTypeDef的指针，用于指定使用的UART端口
+ */
+void Modbus_Init(uint8_t device_address, UART_HandleTypeDef *huart) // 可以设置设备地址
 {
-
     Modbus.MODBUS_SEVER_ID = device_address; // 设置从站地址
+                                             // 选择使用的端口号
+    Modbus.huart = &huart;
 }
 
-// Modbus的发送函数
+/**
+ * @brief 发送Modbus数据
+ *
+ * 该函数通过选定的UART端口使用DMA方式发送数据。
+ *
+ * @param data 指向要发送的数据缓冲区的指针
+ * @param length 要发送的数据长度
+ */
 static void Modbus_Send(uint8_t *data, uint8_t length)
 {
-    HAL_UART_Transmit_DMA(&huart3, data, length); // 使用实际数据长度
+    HAL_UART_Transmit_DMA(Modbus.huart, data, length); // 使用实际数据长度
 }
 
 // CRC 查找表
@@ -68,43 +85,32 @@ static const uint16_t crcTable[256] = {
     0x4400, 0x84C1, 0x8581, 0x4540, 0x8701, 0x47C0, 0x4680, 0x8641,
     0x8201, 0x42C0, 0x4380, 0x8341, 0x4100, 0x81C1, 0x8081, 0x4040};
 
-// 使用查表法计算 CRC
-uint16_t calcCRC(uint8_t *buffer, uint8_t length)
+/**
+ * 计算循环冗余校验码（CRC）
+ * @param buffer 需要计算 CRC 的数据缓冲区
+ * @param length 缓冲区的长度
+ * @return 计算得到的 CRC 值
+ *
+ * 该函数使用预定义的 CRC 表来计算输入缓冲区的循环冗余校验码（CRC）
+ * 它通过异或操作和查表方法逐步更新 CRC 值，最后在返回前调换 CRC 值的高低位
+ */
+static uint16_t calcCRC(uint8_t *buffer, uint8_t length)
 {
-    uint16_t crc = 0xFFFF; // 初始化 CRC 寄存器为 0xFFFF
+    // 初始化 CRC 寄存器为 0xFFFF
+    uint16_t crc = 0xFFFF;
 
+    // 遍历缓冲区中的每个字节
     for (uint8_t i = 0; i < length; i++)
     {
-        uint8_t tableIndex = (crc ^ buffer[i]) & 0xFF; // 计算查表索引
-        crc = (crc >> 8) ^ crcTable[tableIndex];       // 更新 CRC 值
+        // 计算查表索引
+        uint8_t tableIndex = (crc ^ buffer[i]) & 0xFF;
+        // 更新 CRC 值
+        crc = (crc >> 8) ^ crcTable[tableIndex];
     }
 
     // 调换高低位
     return (crc << 8) | (crc >> 8);
 }
-
-// CRC16-MODBUS 校验
-// uint16_t calcCRC(uint8_t *Buffer, uint8_t u8length)
-// {
-//     unsigned int temp, temp2, flag;
-//     temp = 0xFFFF; // 初始化 CRC 寄存器为 0xFFFF
-//     for (unsigned char i = 0; i < u8length; i++)
-//     {
-//         temp = temp ^ Buffer[i]; // 将数据字节与 CRC 寄存器的低字节异或
-//         for (unsigned char j = 1; j <= 8; j++)
-//         {
-//             flag = temp & 0x0001; // 检查最低位
-//             temp >>= 1;           // 右移一位
-//             if (flag)
-//                 temp ^= 0xA001; // 如果最低位为 1，则与多项式 0xA001 异或
-//         }
-//     }
-//     // 交换高低字节顺序
-//     temp2 = temp >> 8;
-//     temp = (temp << 8) | temp2;
-//     temp &= 0xFFFF; // 确保结果为 16 位
-//     return temp;
-// }
 
 /**
  * 根据逻辑地址获取线圈的索引
@@ -178,563 +184,619 @@ uint16_t ReadSingleHoldingRegister(uint16_t logicalAddress)
     return 0;
 }
 
+void Modbus_Data(void)
+{
+    uint16_t expectedLength = 0; // 预期数据长度
+
+    // 初始化 CRC_OK
+    Modbus.CRC_OK = 0;
+
+    log_d("Modbus_Data");
+
+    // 提取并且检查站号是否与对应，站号0是通用的地址，所有的设备都要应答
+    Modbus.u8SrverID = Modbus.u8Data[0];
+    if (Modbus.u8SrverID == Modbus.MODBUS_SEVER_ID || Modbus.u8SrverID == 0)
+    {
+        log_d("Modbus_Data");
+        uint8_t data_len = sizeof(Modbus.u8Data);
+
+        log_d("Size of u8Data: %d", sizeof(Modbus.u8Data));
+        log_d("Address of Modbus: %p", &Modbus);
+
+        // 数据长度检查
+        if (data_len < 8)
+        {
+            log_d("Invalid data length: %d", data_len);
+            memset(Modbus.u8Data, 0, sizeof(Modbus.u8Data));
+            return;
+        }
+
+        // 提取并验证 CRC 校验码
+        Modbus.u16CRC = (Modbus.u8Data[data_len - 2] << 8) | Modbus.u8Data[data_len - 1];
+        Modbus.u16CRC_Calculated = calcCRC(Modbus.u8Data, data_len - 2);
+
+        if (Modbus.u16CRC == Modbus.u16CRC_Calculated)
+        {
+            Modbus.CRC_OK = 1;
+            log_d("CRC_OK");
+
+            // 提取功能码等数据
+            Modbus.u8FunctionCode = Modbus.u8Data[1];
+            Modbus.u16RegAddress = (Modbus.u8Data[2] << 8) | Modbus.u8Data[3];
+            Modbus.u16RegNumber = (Modbus.u8Data[4] << 8) | Modbus.u8Data[5];
+            Modbus.u16WriteValue = Modbus.u16RegNumber;
+
+            // 判断功能码，确定数据的结构
+            if (Modbus.u8FunctionCode == MODBUS_FUNC_READ_COILS ||
+                Modbus.u8FunctionCode == MODBUS_FUNC_READ_DISCRETE_INPUTS ||
+                Modbus.u8FunctionCode == MODBUS_FUNC_READ_HOLDING_REGISTERS ||
+                Modbus.u8FunctionCode == MODBUS_FUNC_READ_INPUT_REGISTERS ||
+                Modbus.u8FunctionCode == MODBUS_FUNC_WRITE_SINGLE_COILS ||
+                Modbus.u8FunctionCode == MODBUS_FUNC_WRITE_SINGLE_REGISTER)
+            {
+                expectedLength = 8;
+            }
+            else if (Modbus.u8FunctionCode == MODBUS_FUNC_WRITE_MULTIPLE_COILS ||
+                     Modbus.u8FunctionCode == MODBUS_FUNC_WRITE_MULTIPLE_REGISTERS)
+            {
+                Modbus.u8byteCount = Modbus.u8Data[6];
+                if (Modbus.u8byteCount > sizeof(Modbus.u16CoilsData))
+                {
+                    log_d("Byte count exceeds buffer size");
+                    memset(Modbus.u8Data, 0, sizeof(Modbus.u8Data));
+                    return;
+                }
+                expectedLength = 9 + Modbus.u8byteCount;
+                for (uint8_t i = 0; i < Modbus.u8byteCount; i++)
+                {
+                    Modbus.u16CoilsData[i] = Modbus.u8Data[7 + i];
+                }
+            }
+            else
+            {
+                log_d("Unsupported function code: %d", Modbus.u8FunctionCode);
+                memset(Modbus.u8Data, 0, sizeof(Modbus.u8Data));
+                return;
+            }
+        }
+        else
+        {
+            log_d("CRC error: Received CRC: %04X, Calculated CRC: %04X", Modbus.u16CRC, Modbus.u16CRC_Calculated);
+            memset(Modbus.u8Data, 0, sizeof(Modbus.u8Data));
+            return;
+        }
+    }
+    else
+    {
+        log_d("Server ID mismatch: Received ID: %d", Modbus.u8SrverID);
+        memset(Modbus.u8Data, 0, sizeof(Modbus.u8Data));
+        return;
+    }
+}
+
 // 提取Modbus数据
 void Modbus_ExtractData(void)
 {
     if (Modbus.Rx_Flag == 1)
     {
-        uint16_t expectedLength = 0;
+        Modbus_Data(); // 提取Modbus数据,成功是Modbus.CRC_OK = 1,失败 是Modbus.CRC_OK = 0
 
-        // 提取从站地址
-        Modbus.u8SrverID = Modbus.u8Data[0];
-
-        if (Modbus.u8SrverID == Modbus.MODBUS_SEVER_ID)
+        if (Modbus.CRC_OK == 1)
         {
-            // 提取功能码
-            Modbus.u8FunctionCode = Modbus.u8Data[1];
-            // 提取线圈地址
-            Modbus.u16CoilsAddress = (Modbus.u8Data[2] << 8) | Modbus.u8Data[3];
 
-            // 提取线圈数量
-            Modbus.u16CoilsNumber = (Modbus.u8Data[4] << 8) | Modbus.u8Data[5];
-
-            // 根据功能码解析数据
-            if (Modbus.u8FunctionCode == MODBUS_FUNC_WRITE_MULTIPLE_COILS || Modbus.u8FunctionCode == MODBUS_FUNC_WRITE_MULTIPLE_REGISTERS) // 写多个寄存器,
+            switch (Modbus.u8FunctionCode)
             {
-                Modbus.u8byteCount = Modbus.u8Data[6]; // 提取字节数
+            case MODBUS_FUNC_READ_COILS:
+                log_d("Function Code: Read Coils"); // 读取线圈状态
+                UpdateCoilsFromGPIO();              // 更新线圈状态
+                /*提取起始地址和线圈数量*/
+                uint16_t startAddress = Modbus.u16RegAddress + MODBUS_COILS_START;
+                uint16_t coilCount = Modbus.u16RegNumber;
 
-                // 写多个线圈或寄存器
-                expectedLength = 7 + Modbus.u8byteCount + 2; // 7字节固定部分 + 数据字节数 + CRC校验码2字节
-
-                // 提取并验证 CRC 校验码
-                Modbus.u16CRC = (Modbus.u8Data[7 + Modbus.u8byteCount] << 8) | Modbus.u8Data[8 + Modbus.u8byteCount];
-                Modbus.u16CRC_Calculated = calcCRC(Modbus.u8Data, 7 + Modbus.u8byteCount);
-
-                // 验证 CRC 校验
-                if (Modbus.u16CRC != Modbus.u16CRC_Calculated)
+                // 判断地址是否在有效范围内
+                if (startAddress < MODBUS_COILS_START || startAddress + coilCount > MODBUS_COILS_START + COILS_COUNT)
                 {
-                    log_e("CRC Check Failed: Received CRC: 0x%04X, Calculated CRC: 0x%04X", Modbus.u16CRC, Modbus.u16CRC_Calculated);
+                    log_e("Invalid address range"); // 无效地址范围
+                    return;
+                }
+
+                break;
+
+            default:
+                break;
+            }
+
+            Modbus.CRC_OK = 0; // 重置CRC标志位
+            return;            // 数据提取成功，直接返回
+        }
+        else if (Modbus.CRC_OK == 0)
+        {
+            // 清空数组
+            memset(Modbus.u8Data, 0, sizeof(Modbus.u8Data));
+            Modbus.Rx_Flag = 0;
+            Modbus.CRC_OK = 0;
+            return; // 直接返回
+        }
+
+#if 0
+        if (Modbus.u16CRC == Modbus.u16CRC_Calculated)
+        {
+            log_d("CRC Check OK");
+
+            // 满足CRC校验条件，执行相应的功能码操作
+            switch (Modbus.u8FunctionCode)
+            {
+            case MODBUS_FUNC_READ_COILS: // 读取线圈
+            {
+                UpdateCoilsFromGPIO(); // 更新线圈状态
+                log_d("Read Coils");
+                // 提取起始地址和线圈数量
+                uint16_t startAddress = Modbus.u16CoilsAddress + MODBUS_COILS_START;
+                uint16_t coilCount = Modbus.u16CoilsNumber;
+
+                // 检查起始地址和线圈数量是否有效
+                if (startAddress < MODBUS_COILS_START || startAddress + coilCount > MODBUS_COILS_END)
+                {
+                    log_e("Invalid Coil Address or Count");
                     memset(Modbus.u8Data, 0, expectedLength);
                     ;       // 清空接收缓冲区
-                    return; // CRC 校验失败，直接返回
+                    return; // 返回错误
                 }
 
-                // 解析数据部分并存储到结构体中
-                for (uint8_t i = 0; i < Modbus.u8byteCount; i++)
+                // 计算需要返回的字节数
+                uint8_t byteCount = (coilCount + 7) / 8; // 每 8 个线圈占 1 字节
+                // 填充响应数据
+                Modbus.TX_Data[0] = Modbus.MODBUS_SEVER_ID; // 从站地址
+                Modbus.TX_Data[1] = MODBUS_FUNC_READ_COILS; // 功能码
+                Modbus.TX_Data[2] = byteCount;              // 数据字节数
+
+                // 填充线圈状态
+                for (uint8_t i = 0; i < byteCount; i++)
                 {
-                    Modbus.u16CoilsData[i] = Modbus.u8Data[7 + i]; // 数据部分从第7字节开始
+                    uint8_t coilByte = 0;
+                    for (uint8_t bit = 0; bit < 8; bit++)
+                    {
+                        uint16_t coilIndex = GetCoilIndex(startAddress + i * 8 + bit);
+                        if (coilIndex != 0xFFFF && coilIndex < COILS_COUNT)
+                        {
+                            if (Coils[coilIndex / 8] & (1 << (coilIndex % 8)))
+                            {
+                                coilByte |= (1 << bit);
+                            }
+                        }
+                    }
+                    Modbus.TX_Data[3 + i] = coilByte;
                 }
 
-                log_d("Function Code: %d, Byte Count: %d", Modbus.u8FunctionCode, Modbus.u8byteCount);
+                // 计算 CRC 校验码
+                Modbus.u8TX_Data_Len = 3 + byteCount; // 数据部分长度
+                Modbus.u16CRC_Calculated = calcCRC(Modbus.TX_Data, Modbus.u8TX_Data_Len);
+                Modbus.TX_Data[Modbus.u8TX_Data_Len] = (Modbus.u16CRC_Calculated >> 8) & 0xFF; // CRC 低字节
+                Modbus.TX_Data[Modbus.u8TX_Data_Len + 1] = Modbus.u16CRC_Calculated & 0xFF;    // CRC 高字节
+                Modbus.u8TX_Data_Len += 2;                                                     // 数据长度加上 CRC 长度
+                // 发送数据
+                Modbus_Send(Modbus.TX_Data, Modbus.u8TX_Data_Len);
+
+                // 发送成功，打印日志发送的数据
+                log_d("Modbus: Send data success.");
+                log_d("Modbus: Server ID: %d", Modbus.MODBUS_SEVER_ID);
+                log_d("Modbus: Function Code: %d", MODBUS_FUNC_READ_COILS);
+                log_d("Modbus: Byte Count: %d", byteCount);
+                for (uint8_t i = 0; i < byteCount; i++)
+                {
+                    log_d("Modbus: Coil %d: %d", startAddress + i, Modbus.TX_Data[3 + i]);
+                }
+                log_d("Modbus: CRC: %04X", Modbus.u16CRC_Calculated);
+                log_d("Modbus: Response Sent");
+
+                break;
             }
-            else if (Modbus.u8FunctionCode == MODBUS_FUNC_READ_COILS || Modbus.u8FunctionCode == MODBUS_FUNC_READ_DISCRETE_INPUTS ||
-                     Modbus.u8FunctionCode == MODBUS_FUNC_READ_HOLDING_REGISTERS || Modbus.u8FunctionCode == MODBUS_FUNC_READ_INPUT_REGISTERS || Modbus.u8FunctionCode == MODBUS_FUNC_WRITE_SINGLE_COILS || Modbus.u8FunctionCode == MODBUS_FUNC_WRITE_SINGLE_REGISTER) // 其他功能码
+            case MODBUS_FUNC_READ_DISCRETE_INPUTS: // 读取离散量输入
             {
-                // 读取操作（如读取线圈、离散输入、保持寄存器、输入寄存器）
-                expectedLength = 6 + 2; // 6字节固定部分 + CRC校验码2字节
+                log_d("Read Discrete Inputs");
+                UpdateDiscreteInputsFromGPIO(); // 更新离散输入状态
 
-                // 提取并验证 CRC 校验码
-                Modbus.u16CRC = (Modbus.u8Data[6] << 8) | Modbus.u8Data[7];
-                Modbus.u16CRC_Calculated = calcCRC(Modbus.u8Data, 6);
+                // 提取起始地址和离散输入数量
+                uint16_t startAddress = Modbus.u16CoilsAddress + MODBUS_DISCRETE_INPUT_START; // 起始地址
+                uint16_t inputCount = Modbus.u16CoilsNumber;                                  // 离散输入数量
 
-                // 验证 CRC 校验
-                if (Modbus.u16CRC != Modbus.u16CRC_Calculated)
+                // 检查起始地址和离散输入数量是否有效
+                if (startAddress < MODBUS_DISCRETE_INPUT_START || startAddress + inputCount > MODBUS_DISCRETE_INPUT_END)
                 {
-                    log_e("CRC Check Failed: Received CRC: 0x%04X, Calculated CRC: 0x%04X", Modbus.u16CRC, Modbus.u16CRC_Calculated);
+                    log_e("Invalid Discrete Input Address or Count");
                     memset(Modbus.u8Data, 0, expectedLength);
                     ;       // 清空接收缓冲区
-                    return; // CRC 校验失败，直接返回
+                    return; // 地址或数量无效，直接返回
                 }
-            }
-            else
-            {
-                log_e("Unsupported Function Code: %d", Modbus.u8FunctionCode);
-                memset(Modbus.u8Data, 0, expectedLength);
-                ;       // 清空接收缓冲区
-                return; // 不支持的功能码，直接返回
-            }
 
-            // 检查是否超出缓冲区大小
-            if (expectedLength > sizeof(Modbus.u8Data))
-            {
-                log_e("Invalid data length: Expected %d, but buffer size is %d", expectedLength, sizeof(Modbus.u8Data));
-                return; // 数据长度超出缓冲区，直接返回
-            }
+                // 计算需要返回的字节数
+                uint8_t byteCount = (inputCount + 7) / 8; // 每 8 个离散输入占 1 字节
 
-            if (Modbus.u16CRC == Modbus.u16CRC_Calculated)
-            {
-                log_d("CRC Check OK");
+                // 填充响应数据
+                Modbus.TX_Data[0] = Modbus.MODBUS_SEVER_ID;           // 从站地址
+                Modbus.TX_Data[1] = MODBUS_FUNC_READ_DISCRETE_INPUTS; // 功能码
+                Modbus.TX_Data[2] = byteCount;                        // 数据字节数
 
-                // 满足CRC校验条件，执行相应的功能码操作
-                switch (Modbus.u8FunctionCode)
+                // 填充离散输入状态
+                for (uint8_t i = 0; i < byteCount; i++)
                 {
-                case MODBUS_FUNC_READ_COILS: // 读取线圈
-                {
-                    UpdateCoilsFromGPIO(); // 更新线圈状态
-                    log_d("Read Coils");
-                    // 提取起始地址和线圈数量
-                    uint16_t startAddress = Modbus.u16CoilsAddress + MODBUS_COILS_START;
-                    uint16_t coilCount = Modbus.u16CoilsNumber;
-
-                    // 检查起始地址和线圈数量是否有效
-                    if (startAddress < MODBUS_COILS_START || startAddress + coilCount > MODBUS_COILS_END)
+                    uint8_t inputByte = 0;
+                    for (uint8_t bit = 0; bit < 8; bit++)
                     {
-                        log_e("Invalid Coil Address or Count");
-                        memset(Modbus.u8Data, 0, expectedLength);
-                        ;       // 清空接收缓冲区
-                        return; // 返回错误
-                    }
-
-                    // 计算需要返回的字节数
-                    uint8_t byteCount = (coilCount + 7) / 8; // 每 8 个线圈占 1 字节
-                    // 填充响应数据
-                    Modbus.TX_Data[0] = Modbus.MODBUS_SEVER_ID; // 从站地址
-                    Modbus.TX_Data[1] = MODBUS_FUNC_READ_COILS; // 功能码
-                    Modbus.TX_Data[2] = byteCount;              // 数据字节数
-
-                    // 填充线圈状态
-                    for (uint8_t i = 0; i < byteCount; i++)
-                    {
-                        uint8_t coilByte = 0;
-                        for (uint8_t bit = 0; bit < 8; bit++)
+                        uint16_t inputIndex = startAddress + i * 8 + bit - MODBUS_DISCRETE_INPUT_START;
+                        if (inputIndex < DISCRETE_INPUT_COUNT)
                         {
-                            uint16_t coilIndex = GetCoilIndex(startAddress + i * 8 + bit);
-                            if (coilIndex != 0xFFFF && coilIndex < COILS_COUNT)
+                            if (DiscreteInputs[inputIndex / 8] & (1 << (inputIndex % 8)))
                             {
-                                if (Coils[coilIndex / 8] & (1 << (coilIndex % 8)))
-                                {
-                                    coilByte |= (1 << bit);
-                                }
+                                inputByte |= (1 << bit); // 设置对应位为 1
                             }
                         }
-                        Modbus.TX_Data[3 + i] = coilByte;
                     }
-
-                    // 计算 CRC 校验码
-                    Modbus.u8TX_Data_Len = 3 + byteCount; // 数据部分长度
-                    Modbus.u16CRC_Calculated = calcCRC(Modbus.TX_Data, Modbus.u8TX_Data_Len);
-                    Modbus.TX_Data[Modbus.u8TX_Data_Len] = (Modbus.u16CRC_Calculated >> 8) & 0xFF; // CRC 低字节
-                    Modbus.TX_Data[Modbus.u8TX_Data_Len + 1] = Modbus.u16CRC_Calculated & 0xFF;    // CRC 高字节
-                    Modbus.u8TX_Data_Len += 2;                                                     // 数据长度加上 CRC 长度
-                    // 发送数据
-                    Modbus_Send(Modbus.TX_Data, Modbus.u8TX_Data_Len);
-
-                    // 发送成功，打印日志发送的数据
-                    log_d("Modbus: Send data success.");
-                    log_d("Modbus: Server ID: %d", Modbus.MODBUS_SEVER_ID);
-                    log_d("Modbus: Function Code: %d", MODBUS_FUNC_READ_COILS);
-                    log_d("Modbus: Byte Count: %d", byteCount);
-                    for (uint8_t i = 0; i < byteCount; i++)
-                    {
-                        log_d("Modbus: Coil %d: %d", startAddress + i, Modbus.TX_Data[3 + i]);
-                    }
-                    log_d("Modbus: CRC: %04X", Modbus.u16CRC_Calculated);
-                    log_d("Modbus: Response Sent");
-
-                    break;
+                    Modbus.TX_Data[3 + i] = inputByte; // 写入响应数据
                 }
-                case MODBUS_FUNC_READ_DISCRETE_INPUTS: // 读取离散量输入
+
+                // 计算 CRC 校验码
+                Modbus.u8TX_Data_Len = 3 + byteCount; // 数据部分长度
+                Modbus.u16CRC_Calculated = calcCRC(Modbus.TX_Data, Modbus.u8TX_Data_Len);
+                Modbus.TX_Data[Modbus.u8TX_Data_Len] = (Modbus.u16CRC_Calculated >> 8) & 0xFF; // CRC 高字节
+                Modbus.TX_Data[Modbus.u8TX_Data_Len + 1] = Modbus.u16CRC_Calculated & 0xFF;    // CRC 低字节
+                Modbus.u8TX_Data_Len += 2;                                                     // 数据长度加上 CRC
+
+                // 发送响应数据
+                Modbus_Send(Modbus.TX_Data, Modbus.u8TX_Data_Len);
+
+                log_d("Read Discrete Inputs Response Sent");
+                break;
+            }
+            case MODBUS_FUNC_READ_HOLDING_REGISTERS: // 读取保持寄存器
+            {
+                log_d("Read Holding Registers");
+
+                //  UpdateInputRegisters(); // 更新输入寄存器
+                UpdateHoldingRegisters(); // 更新保持寄存器
+
+                // 将偏移量转换为逻辑地址
+                uint16_t logicalAddress = Modbus.u16CoilsAddress + MODBUS_HOLDING_REGISTER_START;
+                uint16_t value = ReadSingleHoldingRegister(logicalAddress); // 读取保持寄存器
+
+                log_d("Holding Register Address: %d", logicalAddress);
+                log_d("Holding Register Value: %d", value);
+
+                log_d("Response Sent");
+
+                // 填充响应数据
+                Modbus.TX_Data[0] = Modbus.MODBUS_SEVER_ID;             // 从站地址
+                Modbus.TX_Data[1] = MODBUS_FUNC_READ_HOLDING_REGISTERS; // 功能码
+                Modbus.TX_Data[2] = 2;                                  // 数据字节数
+                Modbus.TX_Data[3] = (value >> 8) & 0xFF;                // 数据高字节
+                Modbus.TX_Data[4] = value & 0xFF;                       // 数据低字节
+
+                // 计算 CRC 校验码
+                Modbus.u8TX_Data_Len = 5; // 数据部分长度（从站地址 + 功能码 + 数据）
+                Modbus.u16CRC_Calculated = calcCRC(Modbus.TX_Data, Modbus.u8TX_Data_Len);
+                Modbus.TX_Data[Modbus.u8TX_Data_Len] = (Modbus.u16CRC_Calculated >> 8) & 0xFF; // CRC 低字节
+                Modbus.TX_Data[Modbus.u8TX_Data_Len + 1] = Modbus.u16CRC_Calculated & 0xFF;    // CRC 高字节
+                Modbus.u8TX_Data_Len += 2;                                                     // 数据长度加上 CRC 长度
+
+                // 发送数据
+                Modbus_Send(Modbus.TX_Data, Modbus.u8TX_Data_Len);
+
+                break;
+            }
+            case MODBUS_FUNC_READ_INPUT_REGISTERS: // 读取输入寄存器
+            {
+                log_d("Read Input Registers");
+
+                // 提取起始地址和寄存器数量
+                uint16_t startAddress = Modbus.u16CoilsAddress + MODBUS_INPUT_REGISTER_START; // 起始地址
+                uint16_t registerCount = Modbus.u16CoilsNumber;                               // 寄存器数量
+
+                // 检查起始地址和寄存器数量是否有效
+                if (startAddress < MODBUS_INPUT_REGISTER_START || startAddress + registerCount > MODBUS_INPUT_REGISTER_END)
                 {
-                    log_d("Read Discrete Inputs");
-                    UpdateDiscreteInputsFromGPIO(); // 更新离散输入状态
-
-                    // 提取起始地址和离散输入数量
-                    uint16_t startAddress = Modbus.u16CoilsAddress + MODBUS_DISCRETE_INPUT_START; // 起始地址
-                    uint16_t inputCount = Modbus.u16CoilsNumber;                                  // 离散输入数量
-
-                    // 检查起始地址和离散输入数量是否有效
-                    if (startAddress < MODBUS_DISCRETE_INPUT_START || startAddress + inputCount > MODBUS_DISCRETE_INPUT_END)
-                    {
-                        log_e("Invalid Discrete Input Address or Count");
-                        memset(Modbus.u8Data, 0, expectedLength);
-                        ;       // 清空接收缓冲区
-                        return; // 地址或数量无效，直接返回
-                    }
-
-                    // 计算需要返回的字节数
-                    uint8_t byteCount = (inputCount + 7) / 8; // 每 8 个离散输入占 1 字节
-
-                    // 填充响应数据
-                    Modbus.TX_Data[0] = Modbus.MODBUS_SEVER_ID;           // 从站地址
-                    Modbus.TX_Data[1] = MODBUS_FUNC_READ_DISCRETE_INPUTS; // 功能码
-                    Modbus.TX_Data[2] = byteCount;                        // 数据字节数
-
-                    // 填充离散输入状态
-                    for (uint8_t i = 0; i < byteCount; i++)
-                    {
-                        uint8_t inputByte = 0;
-                        for (uint8_t bit = 0; bit < 8; bit++)
-                        {
-                            uint16_t inputIndex = startAddress + i * 8 + bit - MODBUS_DISCRETE_INPUT_START;
-                            if (inputIndex < DISCRETE_INPUT_COUNT)
-                            {
-                                if (DiscreteInputs[inputIndex / 8] & (1 << (inputIndex % 8)))
-                                {
-                                    inputByte |= (1 << bit); // 设置对应位为 1
-                                }
-                            }
-                        }
-                        Modbus.TX_Data[3 + i] = inputByte; // 写入响应数据
-                    }
-
-                    // 计算 CRC 校验码
-                    Modbus.u8TX_Data_Len = 3 + byteCount; // 数据部分长度
-                    Modbus.u16CRC_Calculated = calcCRC(Modbus.TX_Data, Modbus.u8TX_Data_Len);
-                    Modbus.TX_Data[Modbus.u8TX_Data_Len] = (Modbus.u16CRC_Calculated >> 8) & 0xFF; // CRC 高字节
-                    Modbus.TX_Data[Modbus.u8TX_Data_Len + 1] = Modbus.u16CRC_Calculated & 0xFF;    // CRC 低字节
-                    Modbus.u8TX_Data_Len += 2;                                                     // 数据长度加上 CRC
-
-                    // 发送响应数据
-                    Modbus_Send(Modbus.TX_Data, Modbus.u8TX_Data_Len);
-
-                    log_d("Read Discrete Inputs Response Sent");
-                    break;
+                    log_e("Invalid Input Register Address or Count");
+                    memset(Modbus.u8Data, 0, expectedLength);
+                    ;       // 清空接收缓冲区
+                    return; // 地址或数量无效，直接返回
                 }
-                case MODBUS_FUNC_READ_HOLDING_REGISTERS: // 读取保持寄存器
+
+                // 计算需要返回的字节数
+                uint8_t byteCount = registerCount * 2; // 每个寄存器占 2 字节
+
+                // 填充响应数据
+                Modbus.TX_Data[0] = Modbus.MODBUS_SEVER_ID;           // 从站地址
+                Modbus.TX_Data[1] = MODBUS_FUNC_READ_INPUT_REGISTERS; // 功能码
+                Modbus.TX_Data[2] = byteCount;                        // 数据字节数
+
+                // 填充输入寄存器的值
+                for (uint16_t i = 0; i < registerCount; i++)
                 {
-                    log_d("Read Holding Registers");
-
-                    UpdateInputRegisters(); // 更新输入寄存器
-
-                    // 将偏移量转换为逻辑地址
-                    uint16_t logicalAddress = Modbus.u16CoilsAddress + MODBUS_HOLDING_REGISTER_START;
-                    uint16_t value = ReadSingleHoldingRegister(logicalAddress); // 读取保持寄存器
-
-                    log_d("Holding Register Address: %d", logicalAddress);
-                    log_d("Holding Register Value: %d", value);
-
-                    log_d("Response Sent");
-
-                    // 填充响应数据
-                    Modbus.TX_Data[0] = Modbus.MODBUS_SEVER_ID;             // 从站地址
-                    Modbus.TX_Data[1] = MODBUS_FUNC_READ_HOLDING_REGISTERS; // 功能码
-                    Modbus.TX_Data[2] = 2;                                  // 数据字节数
-                    Modbus.TX_Data[3] = (value >> 8) & 0xFF;                // 数据高字节
-                    Modbus.TX_Data[4] = value & 0xFF;                       // 数据低字节
-
-                    // 计算 CRC 校验码
-                    Modbus.u8TX_Data_Len = 5; // 数据部分长度（从站地址 + 功能码 + 数据）
-                    Modbus.u16CRC_Calculated = calcCRC(Modbus.TX_Data, Modbus.u8TX_Data_Len);
-                    Modbus.TX_Data[Modbus.u8TX_Data_Len] = (Modbus.u16CRC_Calculated >> 8) & 0xFF; // CRC 低字节
-                    Modbus.TX_Data[Modbus.u8TX_Data_Len + 1] = Modbus.u16CRC_Calculated & 0xFF;    // CRC 高字节
-                    Modbus.u8TX_Data_Len += 2;                                                     // 数据长度加上 CRC 长度
-
-                    // 发送数据
-                    Modbus_Send(Modbus.TX_Data, Modbus.u8TX_Data_Len);
-
-                    break;
-                }
-                case MODBUS_FUNC_READ_INPUT_REGISTERS: // 读取输入寄存器
-                {
-                    log_d("Read Input Registers");
-
-                    // 提取起始地址和寄存器数量
-                    uint16_t startAddress = Modbus.u16CoilsAddress + MODBUS_INPUT_REGISTER_START; // 起始地址
-                    uint16_t registerCount = Modbus.u16CoilsNumber;                               // 寄存器数量
-
-                    // 检查起始地址和寄存器数量是否有效
-                    if (startAddress < MODBUS_INPUT_REGISTER_START || startAddress + registerCount > MODBUS_INPUT_REGISTER_END)
+                    uint16_t registerIndex = startAddress + i - MODBUS_INPUT_REGISTER_START; // 计算寄存器索引
+                    if (registerIndex < INPUT_REGISTER_COUNT)
                     {
-                        log_e("Invalid Input Register Address or Count");
-                        memset(Modbus.u8Data, 0, expectedLength);
-                        ;       // 清空接收缓冲区
-                        return; // 地址或数量无效，直接返回
-                    }
-
-                    // 计算需要返回的字节数
-                    uint8_t byteCount = registerCount * 2; // 每个寄存器占 2 字节
-
-                    // 填充响应数据
-                    Modbus.TX_Data[0] = Modbus.MODBUS_SEVER_ID;           // 从站地址
-                    Modbus.TX_Data[1] = MODBUS_FUNC_READ_INPUT_REGISTERS; // 功能码
-                    Modbus.TX_Data[2] = byteCount;                        // 数据字节数
-
-                    // 填充输入寄存器的值
-                    for (uint16_t i = 0; i < registerCount; i++)
-                    {
-                        uint16_t registerIndex = startAddress + i - MODBUS_INPUT_REGISTER_START; // 计算寄存器索引
-                        if (registerIndex < INPUT_REGISTER_COUNT)
-                        {
-                            uint16_t value = InputRegisters[registerIndex];  // 获取寄存器值
-                            Modbus.TX_Data[3 + i * 2] = (value >> 8) & 0xFF; // 高字节
-                            Modbus.TX_Data[4 + i * 2] = value & 0xFF;        // 低字节
-                        }
-                        else
-                        {
-                            log_e("Invalid Input Register Index: %d", registerIndex);
-                            memset(Modbus.u8Data, 0, expectedLength);
-                            ;       // 清空接收缓冲区
-                            return; // 索引无效，直接返回
-                        }
-                    }
-
-                    // 计算 CRC 校验码
-                    Modbus.u8TX_Data_Len = 3 + byteCount; // 数据部分长度
-                    Modbus.u16CRC_Calculated = calcCRC(Modbus.TX_Data, Modbus.u8TX_Data_Len);
-                    Modbus.TX_Data[Modbus.u8TX_Data_Len] = (Modbus.u16CRC_Calculated >> 8) & 0xFF; // CRC 高字节
-                    Modbus.TX_Data[Modbus.u8TX_Data_Len + 1] = Modbus.u16CRC_Calculated & 0xFF;    // CRC 低字节
-                    Modbus.u8TX_Data_Len += 2;                                                     // 数据长度加上 CRC
-
-                    // 发送响应数据
-                    Modbus_Send(Modbus.TX_Data, Modbus.u8TX_Data_Len);
-
-                    log_d("Read Input Registers Response Sent");
-                    break;
-                }
-                case MODBUS_FUNC_WRITE_SINGLE_COILS: // 写单个线圈
-                {
-                    log_d("Write Single Coils");
-                    // 提取线圈地址和状态
-                    uint16_t coilAddress = Modbus.u16CoilsAddress + MODBUS_COILS_START;
-                    uint16_t writeValue = Modbus.u16CoilsNumber;
-
-                    log_d("Coil Address: %d", coilAddress);
-                    log_d("Write Value: %d", writeValue);
-
-                    // 检查线圈地址是否有效
-                    uint16_t coilIndex = GetCoilIndex(coilAddress);
-                    if (coilIndex == 0xFFFF || coilIndex >= COILS_COUNT)
-                    {
-                        log_e("Invalid Coil Address: %d", coilAddress);
-                        memset(Modbus.u8Data, 0, expectedLength);
-                        ;       // 清空接收缓冲区
-                        return; // 地址无效，直接返回
-                    }
-
-                    // 更新线圈状态
-                    if (writeValue == 0xFF00) // 设置线圈为 ON
-                    {
-                        Coils[coilIndex / 8] |= (1 << (coilIndex % 8));
-                        log_d("Coil %d set to ON", coilAddress);
-                    }
-                    else if (writeValue == 0x0000) // 设置线圈为 OFF
-                    {
-                        Coils[coilIndex / 8] &= ~(1 << (coilIndex % 8));
-                        log_d("Coil %d set to OFF", coilAddress);
+                        uint16_t value = InputRegisters[registerIndex];  // 获取寄存器值
+                        Modbus.TX_Data[3 + i * 2] = (value >> 8) & 0xFF; // 高字节
+                        Modbus.TX_Data[4 + i * 2] = value & 0xFF;        // 低字节
                     }
                     else
                     {
-                        log_e("Invalid Write Value: 0x%04X", writeValue);
-                        return; // 写入值无效，直接返回
-                    }
-
-                    SyncCoilsToGPIO(); // 同步线圈状态到GPIO引脚
-                    // 填充响应数据（与请求相同）
-                    Modbus.TX_Data[0] = Modbus.MODBUS_SEVER_ID;         // 从站地址
-                    Modbus.TX_Data[1] = MODBUS_FUNC_WRITE_SINGLE_COILS; // 功能码
-                    Modbus.TX_Data[2] = Modbus.u8Data[2];               // 线圈地址高字节
-                    Modbus.TX_Data[3] = Modbus.u8Data[3];               // 线圈地址低字节
-                    Modbus.TX_Data[4] = Modbus.u8Data[4];               // 写入值高字节
-                    Modbus.TX_Data[5] = Modbus.u8Data[5];               // 写入值低字节
-
-                    // 计算 CRC 校验码
-                    Modbus.u8TX_Data_Len = 6; // 数据部分长度
-                    Modbus.u16CRC_Calculated = calcCRC(Modbus.TX_Data, Modbus.u8TX_Data_Len);
-                    Modbus.TX_Data[Modbus.u8TX_Data_Len] = (Modbus.u16CRC_Calculated >> 8) & 0xFF; // CRC 低字节
-                    Modbus.TX_Data[Modbus.u8TX_Data_Len + 1] = Modbus.u16CRC_Calculated & 0xFF;    // CRC 高字节
-                    Modbus.u8TX_Data_Len += 2;                                                     // 数据长度加上 CRC
-
-                    // 发送响应数据
-                    Modbus_Send(Modbus.TX_Data, Modbus.u8TX_Data_Len);
-
-                    log_d("Write Single Coil Response Sent");
-
-                    break;
-                }
-                case MODBUS_FUNC_WRITE_SINGLE_REGISTER: // 写单个寄存器
-                {
-                    log_d("Write Single Register");
-
-                    // 提取寄存器地址和写入值
-                    uint16_t registerAddress = (Modbus.u8Data[2] << 8) | Modbus.u8Data[3]; // 寄存器地址
-                    uint16_t writeValue = (Modbus.u8Data[4] << 8) | Modbus.u8Data[5];      // 写入值
-
-                    log_d("Register Address: %d", registerAddress);
-                    log_d("Write Value: %d", writeValue);
-
-                    // 检查寄存器地址是否有效
-                    uint16_t registerIndex = GetHoldingRegisterIndex(registerAddress);
-                    if (registerIndex == 0xFFFF || registerIndex >= HOLDING_REGISTER_COUNT)
-                    {
-                        log_e("Invalid Register Address: %d", registerAddress);
+                        log_e("Invalid Input Register Index: %d", registerIndex);
                         memset(Modbus.u8Data, 0, expectedLength);
                         ;       // 清空接收缓冲区
-                        return; // 地址无效，直接返回
+                        return; // 索引无效，直接返回
                     }
-
-                    // 更新保持寄存器的值
-                    HoldingRegisters[registerIndex] = writeValue;
-                    log_d("Holding Register[%d] updated to %d", registerIndex, writeValue);
-
-                    // 填充响应数据（与请求相同）
-                    Modbus.TX_Data[0] = Modbus.MODBUS_SEVER_ID;            // 从站地址
-                    Modbus.TX_Data[1] = MODBUS_FUNC_WRITE_SINGLE_REGISTER; // 功能码
-                    Modbus.TX_Data[2] = Modbus.u8Data[2];                  // 寄存器地址高字节
-                    Modbus.TX_Data[3] = Modbus.u8Data[3];                  // 寄存器地址低字节
-                    Modbus.TX_Data[4] = Modbus.u8Data[4];                  // 写入值高字节
-                    Modbus.TX_Data[5] = Modbus.u8Data[5];                  // 写入值低字节
-
-                    // 计算 CRC 校验码
-                    Modbus.u8TX_Data_Len = 6; // 数据部分长度
-                    Modbus.u16CRC_Calculated = calcCRC(Modbus.TX_Data, Modbus.u8TX_Data_Len);
-                    Modbus.TX_Data[Modbus.u8TX_Data_Len] = (Modbus.u16CRC_Calculated >> 8) & 0xFF; // CRC 高字节
-                    Modbus.TX_Data[Modbus.u8TX_Data_Len + 1] = Modbus.u16CRC_Calculated & 0xFF;    // CRC 低字节
-                    Modbus.u8TX_Data_Len += 2;                                                     // 数据长度加上 CRC
-
-                    // 发送响应数据
-                    Modbus_Send(Modbus.TX_Data, Modbus.u8TX_Data_Len);
-
-                    log_d("Write Single Register Response Sent");
-                    break;
                 }
-                case MODBUS_FUNC_WRITE_MULTIPLE_COILS: // 写多个线圈
-                {
-                    log_d("Write Multiple Coils");
-                    uint16_t StartAddress = Modbus.u16CoilsAddress + MODBUS_COILS_START; // 起始地址
-                    uint16_t Quantity = Modbus.u16CoilsNumber;                           // 数量
-                    uint16_t ByteCount = Modbus.u8byteCount;                             // 字节数
 
-                    log_d("Start Address: %d, Coil Count: %d, Byte Count: %d", StartAddress, Quantity, ByteCount);
+                // 计算 CRC 校验码
+                Modbus.u8TX_Data_Len = 3 + byteCount; // 数据部分长度
+                Modbus.u16CRC_Calculated = calcCRC(Modbus.TX_Data, Modbus.u8TX_Data_Len);
+                Modbus.TX_Data[Modbus.u8TX_Data_Len] = (Modbus.u16CRC_Calculated >> 8) & 0xFF; // CRC 高字节
+                Modbus.TX_Data[Modbus.u8TX_Data_Len + 1] = Modbus.u16CRC_Calculated & 0xFF;    // CRC 低字节
+                Modbus.u8TX_Data_Len += 2;                                                     // 数据长度加上 CRC
 
-                    // 检查起始地址和线圈数量是否有效
-                    if (StartAddress < MODBUS_COILS_START || StartAddress + Quantity > MODBUS_COILS_END)
-                    {
-                        log_e("Invalid Coil Address or Count");
-                        memset(Modbus.u8Data, 0, expectedLength);
-                        ;       // 清空接收缓冲区
-                        return; // 地址或数量无效，直接返回
-                    }
+                // 发送响应数据
+                Modbus_Send(Modbus.TX_Data, Modbus.u8TX_Data_Len);
 
-                    // 遍历线圈状态字节，更新 Coils 数组
-                    for (uint16_t i = 0; i < Quantity; i++)
-                    {
-                        uint16_t coilIndex = GetCoilIndex(StartAddress + i); // 获取线圈索引
-                        if (coilIndex == 0xFFFF || coilIndex >= COILS_COUNT)
-                        {
-                            log_e("Invalid Coil Index: %d", coilIndex);
-                            return; // 索引无效，直接返回
-                        }
-
-                        // 获取当前线圈的状态（从数据字节中提取）
-                        uint8_t byteIndex = (i / 8); // 数据字节的索引
-                        uint8_t bitIndex = i % 8;    // 数据字节中的位索引
-                        uint8_t coilState = (Modbus.u16CoilsData[byteIndex] >> bitIndex) & 0x01;
-
-                        // 更新 Coils 数组中的状态
-                        if (coilState)
-                        {
-                            Coils[coilIndex / 8] |= (1 << (coilIndex % 8)); // 设置线圈为 ON
-                        }
-                        else
-                        {
-                            Coils[coilIndex / 8] &= ~(1 << (coilIndex % 8)); // 设置线圈为 OFF
-                        }
-                    }
-
-                    // 同步线圈状态到硬件
-                    SyncCoilsToGPIO();
-
-                    // 填充响应数据（与请求的起始地址和线圈数量相同）
-                    Modbus.TX_Data[0] = Modbus.MODBUS_SEVER_ID;           // 从站地址
-                    Modbus.TX_Data[1] = MODBUS_FUNC_WRITE_MULTIPLE_COILS; // 功能码
-                    Modbus.TX_Data[2] = Modbus.u8Data[2];                 // 起始地址高字节
-                    Modbus.TX_Data[3] = Modbus.u8Data[3];                 // 起始地址低字节
-                    Modbus.TX_Data[4] = Modbus.u8Data[4];                 // 线圈数量高字节
-                    Modbus.TX_Data[5] = Modbus.u8Data[5];                 // 线圈数量低字节
-
-                    // 计算 CRC 校验码
-                    Modbus.u8TX_Data_Len = 6; // 数据部分长度
-                    Modbus.u16CRC_Calculated = calcCRC(Modbus.TX_Data, Modbus.u8TX_Data_Len);
-                    Modbus.TX_Data[Modbus.u8TX_Data_Len] = (Modbus.u16CRC_Calculated >> 8) & 0xFF; // CRC 低字节
-                    Modbus.TX_Data[Modbus.u8TX_Data_Len + 1] = Modbus.u16CRC_Calculated & 0xFF;    // CRC 高字节
-                    Modbus.u8TX_Data_Len += 2;                                                     // 数据长度加上 CRC
-
-                    // 发送响应数据
-                    Modbus_Send(Modbus.TX_Data, Modbus.u8TX_Data_Len);
-
-                    log_d("Write Multiple Coils Response Sent");
-
-                    break;
-                }
-                case MODBUS_FUNC_WRITE_MULTIPLE_REGISTERS: // 写多个寄存器
-                {
-                    log_d("Write Multiple Registers");
-
-                    // 提取起始地址和寄存器数量
-                    uint16_t startAddress = (Modbus.u8Data[2] << 8) | Modbus.u8Data[3];  // 起始地址
-                    uint16_t registerCount = (Modbus.u8Data[4] << 8) | Modbus.u8Data[5]; // 寄存器数量
-                    uint8_t byteCount = Modbus.u8Data[6];                                // 数据字节数
-
-                    log_d("Start Address: %d, Register Count: %d, Byte Count: %d", startAddress, registerCount, byteCount);
-
-                    // 检查起始地址和寄存器数量是否有效
-                    if (startAddress < MODBUS_HOLDING_REGISTER_START ||
-                        startAddress + registerCount > MODBUS_HOLDING_REGISTER_END ||
-                        byteCount != registerCount * 2)
-                    {
-                        log_e("Invalid Register Address, Count, or Byte Count");
-                        memset(Modbus.u8Data, 0, expectedLength);
-                        ;       // 清空接收缓冲区
-                        return; // 地址或数量无效，直接返回
-                    }
-
-                    // 遍历寄存器数据并更新保持寄存器
-                    for (uint16_t i = 0; i < registerCount; i++)
-                    {
-                        uint16_t registerIndex = startAddress + i - MODBUS_HOLDING_REGISTER_START; // 计算寄存器索引
-                        if (registerIndex >= HOLDING_REGISTER_COUNT)
-                        {
-                            log_e("Invalid Register Index: %d", registerIndex);
-                            memset(Modbus.u8Data, 0, expectedLength);
-                            ;       // 清空接收缓冲区
-                            return; // 索引无效，直接返回
-                        }
-
-                        // 提取寄存器值（高字节和低字节）
-                        uint16_t value = (Modbus.u8Data[7 + i * 2] << 8) | Modbus.u8Data[8 + i * 2];
-                        HoldingRegisters[registerIndex] = value; // 更新保持寄存器
-                        log_d("Holding Register[%d] updated to %d", registerIndex, value);
-                    }
-
-                    // 填充响应数据（与请求的起始地址和寄存器数量相同）
-                    Modbus.TX_Data[0] = Modbus.MODBUS_SEVER_ID;               // 从站地址
-                    Modbus.TX_Data[1] = MODBUS_FUNC_WRITE_MULTIPLE_REGISTERS; // 功能码
-                    Modbus.TX_Data[2] = Modbus.u8Data[2];                     // 起始地址高字节
-                    Modbus.TX_Data[3] = Modbus.u8Data[3];                     // 起始地址低字节
-                    Modbus.TX_Data[4] = Modbus.u8Data[4];                     // 寄存器数量高字节
-                    Modbus.TX_Data[5] = Modbus.u8Data[5];                     // 寄存器数量低字节
-
-                    // 计算 CRC 校验码
-                    Modbus.u8TX_Data_Len = 6; // 数据部分长度
-                    Modbus.u16CRC_Calculated = calcCRC(Modbus.TX_Data, Modbus.u8TX_Data_Len);
-                    Modbus.TX_Data[Modbus.u8TX_Data_Len] = (Modbus.u16CRC_Calculated >> 8) & 0xFF; // CRC 高字节
-                    Modbus.TX_Data[Modbus.u8TX_Data_Len + 1] = Modbus.u16CRC_Calculated & 0xFF;    // CRC 低字节
-                    Modbus.u8TX_Data_Len += 2;                                                     // 数据长度加上 CRC
-
-                    // 发送响应数据
-                    Modbus_Send(Modbus.TX_Data, Modbus.u8TX_Data_Len);
-
-                    log_d("Write Multiple Registers Response Sent");
-                    break;
-                }
-                }
+                log_d("Read Input Registers Response Sent");
+                break;
             }
-            else if (Modbus.u16CRC != Modbus.u16CRC_Calculated)
+            case MODBUS_FUNC_WRITE_SINGLE_COILS: // 写单个线圈
             {
-                log_d("CRC Check Error");
-                // 俩校验码是什么
-                log_d("Received CRC: %04X, Calculated CRC: %04X", Modbus.u16CRC, Modbus.u16CRC_Calculated);
-                memset(Modbus.u8Data, 0, expectedLength);
-                ; // 清空接收缓冲区
+                log_d("Write Single Coils");
+                // 提取线圈地址和状态
+                uint16_t coilAddress = Modbus.u16CoilsAddress + MODBUS_COILS_START;
+                uint16_t writeValue = Modbus.u16CoilsNumber;
 
-                return; // CRC 校验失败，直接返回
+                log_d("Coil Address: %d", coilAddress);
+                log_d("Write Value: %d", writeValue);
+
+                // 检查线圈地址是否有效
+                uint16_t coilIndex = GetCoilIndex(coilAddress);
+                if (coilIndex == 0xFFFF || coilIndex >= COILS_COUNT)
+                {
+                    log_e("Invalid Coil Address: %d", coilAddress);
+                    memset(Modbus.u8Data, 0, expectedLength);
+                    ;       // 清空接收缓冲区
+                    return; // 地址无效，直接返回
+                }
+
+                // 更新线圈状态
+                if (writeValue == 0xFF00) // 设置线圈为 ON
+                {
+                    Coils[coilIndex / 8] |= (1 << (coilIndex % 8));
+                    log_d("Coil %d set to ON", coilAddress);
+                }
+                else if (writeValue == 0x0000) // 设置线圈为 OFF
+                {
+                    Coils[coilIndex / 8] &= ~(1 << (coilIndex % 8));
+                    log_d("Coil %d set to OFF", coilAddress);
+                }
+                else
+                {
+                    log_e("Invalid Write Value: 0x%04X", writeValue);
+                    return; // 写入值无效，直接返回
+                }
+
+                SyncCoilsToGPIO(); // 同步线圈状态到GPIO引脚
+                // 填充响应数据（与请求相同）
+                Modbus.TX_Data[0] = Modbus.MODBUS_SEVER_ID;         // 从站地址
+                Modbus.TX_Data[1] = MODBUS_FUNC_WRITE_SINGLE_COILS; // 功能码
+                Modbus.TX_Data[2] = Modbus.u8Data[2];               // 线圈地址高字节
+                Modbus.TX_Data[3] = Modbus.u8Data[3];               // 线圈地址低字节
+                Modbus.TX_Data[4] = Modbus.u8Data[4];               // 写入值高字节
+                Modbus.TX_Data[5] = Modbus.u8Data[5];               // 写入值低字节
+
+                // 计算 CRC 校验码
+                Modbus.u8TX_Data_Len = 6; // 数据部分长度
+                Modbus.u16CRC_Calculated = calcCRC(Modbus.TX_Data, Modbus.u8TX_Data_Len);
+                Modbus.TX_Data[Modbus.u8TX_Data_Len] = (Modbus.u16CRC_Calculated >> 8) & 0xFF; // CRC 低字节
+                Modbus.TX_Data[Modbus.u8TX_Data_Len + 1] = Modbus.u16CRC_Calculated & 0xFF;    // CRC 高字节
+                Modbus.u8TX_Data_Len += 2;                                                     // 数据长度加上 CRC
+
+                // 发送响应数据
+                Modbus_Send(Modbus.TX_Data, Modbus.u8TX_Data_Len);
+
+                log_d("Write Single Coil Response Sent");
+
+                break;
+            }
+            case MODBUS_FUNC_WRITE_SINGLE_REGISTER: // 写单个寄存器
+            {
+                log_d("Write Single Register");
+                UpdateHoldingRegisters(); // 更新保持寄存器状态
+
+                // 提取寄存器地址和写入值
+                uint16_t registerAddress = (Modbus.u8Data[2] << 8) | Modbus.u8Data[3]; // 寄存器地址
+                uint16_t writeValue = (Modbus.u8Data[4] << 8) | Modbus.u8Data[5];      // 写入值
+
+                log_d("Register Address: %d", registerAddress);
+                log_d("Write Value: %d", writeValue);
+
+                // 检查寄存器地址是否有效
+                uint16_t registerIndex = GetHoldingRegisterIndex(registerAddress);
+                if (registerIndex == 0xFFFF || registerIndex >= HOLDING_REGISTER_COUNT)
+                {
+                    log_e("Invalid Register Address: %d", registerAddress);
+                    memset(Modbus.u8Data, 0, expectedLength);
+                    ;       // 清空接收缓冲区
+                    return; // 地址无效，直接返回
+                }
+
+                // 更新保持寄存器的值
+                HoldingRegisters[registerIndex] = writeValue;
+                log_d("Holding Register[%d] updated to %d", registerIndex, writeValue);
+
+                // 填充响应数据（与请求相同）
+                Modbus.TX_Data[0] = Modbus.MODBUS_SEVER_ID;            // 从站地址
+                Modbus.TX_Data[1] = MODBUS_FUNC_WRITE_SINGLE_REGISTER; // 功能码
+                Modbus.TX_Data[2] = Modbus.u8Data[2];                  // 寄存器地址高字节
+                Modbus.TX_Data[3] = Modbus.u8Data[3];                  // 寄存器地址低字节
+                Modbus.TX_Data[4] = Modbus.u8Data[4];                  // 写入值高字节
+                Modbus.TX_Data[5] = Modbus.u8Data[5];                  // 写入值低字节
+
+                // 计算 CRC 校验码
+                Modbus.u8TX_Data_Len = 6; // 数据部分长度
+                Modbus.u16CRC_Calculated = calcCRC(Modbus.TX_Data, Modbus.u8TX_Data_Len);
+                Modbus.TX_Data[Modbus.u8TX_Data_Len] = (Modbus.u16CRC_Calculated >> 8) & 0xFF; // CRC 高字节
+                Modbus.TX_Data[Modbus.u8TX_Data_Len + 1] = Modbus.u16CRC_Calculated & 0xFF;    // CRC 低字节
+                Modbus.u8TX_Data_Len += 2;                                                     // 数据长度加上 CRC
+
+                // 发送响应数据
+                Modbus_Send(Modbus.TX_Data, Modbus.u8TX_Data_Len);
+
+                log_d("Write Single Register Response Sent");
+                break;
+            }
+            case MODBUS_FUNC_WRITE_MULTIPLE_COILS: // 写多个线圈
+            {
+                log_d("Write Multiple Coils");
+                uint16_t StartAddress = Modbus.u16CoilsAddress + MODBUS_COILS_START; // 起始地址
+                uint16_t Quantity = Modbus.u16CoilsNumber;                           // 数量
+                uint16_t ByteCount = Modbus.u8byteCount;                             // 字节数
+
+                log_d("Start Address: %d, Coil Count: %d, Byte Count: %d", StartAddress, Quantity, ByteCount);
+
+                // 检查起始地址和线圈数量是否有效
+                if (StartAddress < MODBUS_COILS_START || StartAddress + Quantity > MODBUS_COILS_END)
+                {
+                    log_e("Invalid Coil Address or Count");
+                    memset(Modbus.u8Data, 0, expectedLength);
+                    ;       // 清空接收缓冲区
+                    return; // 地址或数量无效，直接返回
+                }
+
+                // 遍历线圈状态字节，更新 Coils 数组
+                for (uint16_t i = 0; i < Quantity; i++)
+                {
+                    uint16_t coilIndex = GetCoilIndex(StartAddress + i); // 获取线圈索引
+                    if (coilIndex == 0xFFFF || coilIndex >= COILS_COUNT)
+                    {
+                        log_e("Invalid Coil Index: %d", coilIndex);
+                        return; // 索引无效，直接返回
+                    }
+
+                    // 获取当前线圈的状态（从数据字节中提取）
+                    uint8_t byteIndex = (i / 8); // 数据字节的索引
+                    uint8_t bitIndex = i % 8;    // 数据字节中的位索引
+                    uint8_t coilState = (Modbus.u16CoilsData[byteIndex] >> bitIndex) & 0x01;
+
+                    // 更新 Coils 数组中的状态
+                    if (coilState)
+                    {
+                        Coils[coilIndex / 8] |= (1 << (coilIndex % 8)); // 设置线圈为 ON
+                    }
+                    else
+                    {
+                        Coils[coilIndex / 8] &= ~(1 << (coilIndex % 8)); // 设置线圈为 OFF
+                    }
+                }
+
+                // 同步线圈状态到硬件
+                SyncCoilsToGPIO();
+
+                // 填充响应数据（与请求的起始地址和线圈数量相同）
+                Modbus.TX_Data[0] = Modbus.MODBUS_SEVER_ID;           // 从站地址
+                Modbus.TX_Data[1] = MODBUS_FUNC_WRITE_MULTIPLE_COILS; // 功能码
+                Modbus.TX_Data[2] = Modbus.u8Data[2];                 // 起始地址高字节
+                Modbus.TX_Data[3] = Modbus.u8Data[3];                 // 起始地址低字节
+                Modbus.TX_Data[4] = Modbus.u8Data[4];                 // 线圈数量高字节
+                Modbus.TX_Data[5] = Modbus.u8Data[5];                 // 线圈数量低字节
+
+                // 计算 CRC 校验码
+                Modbus.u8TX_Data_Len = 6; // 数据部分长度
+                Modbus.u16CRC_Calculated = calcCRC(Modbus.TX_Data, Modbus.u8TX_Data_Len);
+                Modbus.TX_Data[Modbus.u8TX_Data_Len] = (Modbus.u16CRC_Calculated >> 8) & 0xFF; // CRC 低字节
+                Modbus.TX_Data[Modbus.u8TX_Data_Len + 1] = Modbus.u16CRC_Calculated & 0xFF;    // CRC 高字节
+                Modbus.u8TX_Data_Len += 2;                                                     // 数据长度加上 CRC
+
+                // 发送响应数据
+                Modbus_Send(Modbus.TX_Data, Modbus.u8TX_Data_Len);
+
+                log_d("Write Multiple Coils Response Sent");
+
+                break;
+            }
+            case MODBUS_FUNC_WRITE_MULTIPLE_REGISTERS: // 写多个寄存器
+            {
+                log_d("Write Multiple Registers");
+
+                UpdateHoldingRegisters(); // 更新保持寄存器状态
+                // 提取起始地址和寄存器数量
+                uint16_t startAddress = (Modbus.u8Data[2] << 8) | Modbus.u8Data[3];  // 起始地址
+                uint16_t registerCount = (Modbus.u8Data[4] << 8) | Modbus.u8Data[5]; // 寄存器数量
+                uint8_t byteCount = Modbus.u8Data[6];                                // 数据字节数
+
+                log_d("Start Address: %d, Register Count: %d, Byte Count: %d", startAddress, registerCount, byteCount);
+
+                // 检查起始地址和寄存器数量是否有效
+                if (startAddress < MODBUS_HOLDING_REGISTER_START ||
+                    startAddress + registerCount > MODBUS_HOLDING_REGISTER_END ||
+                    byteCount != registerCount * 2)
+                {
+                    log_e("Invalid Register Address, Count, or Byte Count");
+                    memset(Modbus.u8Data, 0, expectedLength);
+                    ;       // 清空接收缓冲区
+                    return; // 地址或数量无效，直接返回
+                }
+
+                // 遍历寄存器数据并更新保持寄存器
+                for (uint16_t i = 0; i < registerCount; i++)
+                {
+                    uint16_t registerIndex = startAddress + i - MODBUS_HOLDING_REGISTER_START; // 计算寄存器索引
+                    if (registerIndex >= HOLDING_REGISTER_COUNT)
+                    {
+                        log_e("Invalid Register Index: %d", registerIndex);
+                        memset(Modbus.u8Data, 0, expectedLength);
+                        ;       // 清空接收缓冲区
+                        return; // 索引无效，直接返回
+                    }
+
+                    // 提取寄存器值（高字节和低字节）
+                    uint16_t value = (Modbus.u8Data[7 + i * 2] << 8) | Modbus.u8Data[8 + i * 2];
+                    HoldingRegisters[registerIndex] = value; // 更新保持寄存器
+                    log_d("Holding Register[%d] updated to %d", registerIndex, value);
+                }
+
+                // 填充响应数据（与请求的起始地址和寄存器数量相同）
+                Modbus.TX_Data[0] = Modbus.MODBUS_SEVER_ID;               // 从站地址
+                Modbus.TX_Data[1] = MODBUS_FUNC_WRITE_MULTIPLE_REGISTERS; // 功能码
+                Modbus.TX_Data[2] = Modbus.u8Data[2];                     // 起始地址高字节
+                Modbus.TX_Data[3] = Modbus.u8Data[3];                     // 起始地址低字节
+                Modbus.TX_Data[4] = Modbus.u8Data[4];                     // 寄存器数量高字节
+                Modbus.TX_Data[5] = Modbus.u8Data[5];                     // 寄存器数量低字节
+
+                // 计算 CRC 校验码
+                Modbus.u8TX_Data_Len = 6; // 数据部分长度
+                Modbus.u16CRC_Calculated = calcCRC(Modbus.TX_Data, Modbus.u8TX_Data_Len);
+                Modbus.TX_Data[Modbus.u8TX_Data_Len] = (Modbus.u16CRC_Calculated >> 8) & 0xFF; // CRC 高字节
+                Modbus.TX_Data[Modbus.u8TX_Data_Len + 1] = Modbus.u16CRC_Calculated & 0xFF;    // CRC 低字节
+                Modbus.u8TX_Data_Len += 2;                                                     // 数据长度加上 CRC
+
+                // 发送响应数据
+                Modbus_Send(Modbus.TX_Data, Modbus.u8TX_Data_Len);
+
+                log_d("Write Multiple Registers Response Sent");
+                break;
+            }
             }
         }
-        Modbus.Rx_Flag = 0; // 清除接收标志位
-        memset(Modbus.u8Data, 0, expectedLength);
-        ; // 清空接收缓冲区
+        else if (Modbus.u16CRC != Modbus.u16CRC_Calculated)
+        {
+            log_d("CRC Check Error");
+            // 俩校验码是什么
+            log_d("Received CRC: %04X, Calculated CRC: %04X", Modbus.u16CRC, Modbus.u16CRC_Calculated);
+            memset(Modbus.u8Data, 0, expectedLength);
+            ; // 清空接收缓冲区
 
-        return; // 返回
+            return; // CRC 校验失败，直接返回
+        }
+    }
+    Modbus.Rx_Flag = 0; // 清除接收标志位
+    memset(Modbus.u8Data, 0, expectedLength);
+    ; // 清空接收缓冲区
+#endif
+        Modbus.Rx_Flag = 0; // 清除接收标志位
+        return;             // 返回
     }
 }
 
@@ -898,13 +960,18 @@ static void UpdateInputRegisters(void)
 
 static void UpdateHoldingRegisters(void)
 {
-    // 示例：从传感器读取数据
-    AHT20_Read(&modbus_sensorData); // 读取温湿度传感器数据
 
     // 填充保持寄存器
-    HoldingRegisters[0] = Modbus.MODBUS_SEVER_ID;                      // 将从站地址存入保持寄存器
-    HoldingRegisters[1] = (int16_t)modbus_sensorData.Temperature * 10; // 温度，单位为 0.1°C
-    HoldingRegisters[2] = (int16_t)modbus_sensorData.Humidity * 10;    // 湿度，单位为 0.1%RH
+    HoldingRegisters[0] = Modbus.MODBUS_SEVER_ID; // 将从站地址存入保持寄存器
+                                                  // HoldingRegisters[1] = g_robot.vx_up;          // 机器人前进速度
+                                                  // HoldingRegisters[2] = g_robot.vy_up;          // 机器人侧向速度
+                                                  // HoldingRegisters[3] = g_robot.omega_up;       // 机器人角速度
+                                                  // HoldingRegisters[4] = g_robot.gear_up;        // 机器人档位
+
+    HoldingRegisters[1] = 11; // 机器人前进速度
+    HoldingRegisters[2] = 12; // 机器人侧向速度
+    HoldingRegisters[3] = 13; // 机器人角速度
+    HoldingRegisters[4] = 14; // 机器人档位
 
     // 示例：填充其他保持寄存器（如设备状态）
     // HoldingRegisters[3] = HAL_GPIO_ReadPin(STATUS_GPIO_Port, STATUS_Pin); // 设备状态（0 或 1）
@@ -918,9 +985,9 @@ void Modbus_DataUpdate(void *argument)
     {
 
         // --------------------------更新保持寄存器状态---------------------------//
-        UpdateHoldingRegisters(); // 更新保持寄存器状态
 
-        Modbus_ExtractData(); // 提取Modbus数据
-        osDelay(100);         // 延时100ms
+        //Modbus_ExtractData();                           // 提取Modbus数据
+        HAL_GPIO_TogglePin(LED_G_GPIO_Port, LED_G_Pin); // 切换绿色LED状态
+        osDelay(100);                                   // 延时100ms
     }
 }

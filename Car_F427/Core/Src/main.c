@@ -72,22 +72,7 @@ void MX_FREERTOS_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-void HAL_SPI_ErrorCallback(SPI_HandleTypeDef *hspi)
-{
-    if (hspi == &ST7735_SPI_PORT)
-    {
-        // 打印错误信息或执行错误处理逻辑
-        printf("SPI DMA Error!\r\n");
-    }
-}
 
-void HAL_SPI_TxCpltCallback(SPI_HandleTypeDef *hspi)
-{
-    if (hspi == &ST7735_SPI_PORT)
-    {
-       // printf("SPI DMA OK!\r\n");
-    }
-}
 /* USER CODE END 0 */
 
 /**
@@ -133,14 +118,15 @@ int main(void)
   /* USER CODE BEGIN 2 */
 
   HAL_ADC_Start_IT(&hadc1); // 开始ADC转换
-  USER_USART_INIT();        // 初始化USART接收中断
-  easylogger_init();
+
   HAL_TIM_Base_Init(&htim3);
   HAL_TIM_Base_Start_IT(&htim3); // 使用中断模式启动TIM6
 
-  Modbus_Init(0x01); // 初始化Modbus，设置从站地址为0x01
+  easylogger_init();
+  USER_USART_INIT();          // 初始化USART接收中断
+  Modbus_Init(0x01, &huart6); // 初始化Modbus，设置从站地址为0x01
   // init(); // 初始化电机和PID
-  // ST7735_Init();
+  //  ST7735_Init();
   HAL_GPIO_WritePin(OUT3_GPIO_Port, OUT3_Pin, GPIO_PIN_SET); // 设置OUT3引脚为高电平
 
   /* USER CODE END 2 */

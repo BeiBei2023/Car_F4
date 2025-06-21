@@ -39,21 +39,23 @@ void task_remote_attr(void *argument)
     g_robot.motor_rpm[2] = 0;
     g_robot.motor_rpm[3] = 0;
 
-
-
-
     for (;;)
     {
 
-        // 归1
-        g_robot.x = ((float)sbus_ch_data.channels[SBUS_CH_VX] - 1500.0f) / 500.0f;
-        g_robot.y = ((float)sbus_ch_data.channels[SBUS_CH_VY] - 1500.0f) / 500.0f;
-        g_robot.w = ((float)sbus_ch_data.channels[SBUS_CH_OMEGA] - 1500.0f) / 500.0f;
-        uint16_t gear_value = sbus_ch_data.channels[SBUS_CH_GEAR];
+        if (sbus_ch_data.flags == 0 && sbus_ch_data.channels[5] == 1000)
+        {
+            // 归1
+            g_robot.x = ((float)sbus_ch_data.channels[SBUS_CH_VX] - 1500.0f) / 500.0f;
+            g_robot.y = ((float)sbus_ch_data.channels[SBUS_CH_VY] - 1500.0f) / 500.0f;
+            g_robot.w = ((float)sbus_ch_data.channels[SBUS_CH_OMEGA] - 1500.0f) / 500.0f;
+            uint16_t gear_value = sbus_ch_data.channels[SBUS_CH_GEAR];
+            target_speed_conversion(g_robot.x, g_robot.y, g_robot.w, gear_value);
+        }
+        else if (sbus_ch_data.flags == 4)
 
-
-
-        target_speed_conversion(g_robot.x, g_robot.y, g_robot.w, gear_value);
+        {
+            target_speed_conversion(g_robot.vx_up, g_robot.vy_up, g_robot.omega_up, g_robot.gear_up);
+        }
 
         vTaskDelayUntil(&xLastWakeTime, pdMS_TO_TICKS(task_period));
     }

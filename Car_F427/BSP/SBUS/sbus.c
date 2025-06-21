@@ -35,8 +35,6 @@ void sbus_decode_frame(uint8_t *buf)
 
         sbus_ch_data.flags = buf[23];
     }
-
-    //log_d("SBUS Channels");
 }
 
 /**

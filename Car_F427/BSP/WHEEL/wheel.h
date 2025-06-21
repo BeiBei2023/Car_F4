@@ -38,6 +38,13 @@ typedef struct
     float vy;
     float omega;
 
+    //上位机发送的速度
+    float vx_up;   // 上位机发送的前后速度
+    float vy_up;   // 上位机发送的横向速度
+    float omega_up; // 上位机发送的旋转速度
+    float gear_up; // 上位机发送的档位
+
+    /* 机器人状态 */
     uint8_t work;      // 归一化，-1时停止，1启动
     int8_t speed_mode; // 0-低速 1-中速 2-高速
 

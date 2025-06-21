@@ -210,15 +210,6 @@
         "files": [],
         "folders": [
           {
-            "name": "SBUS",
-            "files": [
-              {
-                "path": "../BSP/SBUS/sbus.c"
-              }
-            ],
-            "folders": []
-          },
-          {
             "name": "M3508",
             "files": [
               {
@@ -337,6 +328,15 @@
             "files": [
               {
                 "path": "../BSP/IMU/QMI8658A.c"
+              }
+            ],
+            "folders": []
+          },
+          {
+            "name": "SBUS",
+            "files": [
+              {
+                "path": "../BSP/SBUS/sbus.c"
               }
             ],
             "folders": []

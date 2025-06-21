@@ -20,9 +20,10 @@
 
 #include <stdint.h>
 #include "aht20.h"
+#include "wheel.h"
 
 extern UART_HandleTypeDef huart3;
-
+extern UART_HandleTypeDef huart6;
 // Modbus功能码定义
 #define MODBUS_FUNC_READ_COILS 0x01               // 读线圈
 #define MODBUS_FUNC_READ_DISCRETE_INPUTS 0x02     // 读离散输入
@@ -48,39 +49,42 @@ extern UART_HandleTypeDef huart3;
 #define MODBUS_HOLDING_REGISTER_END 49999   // 保持寄存器结束地址
 
 // 全局变量声明
-#define HOLDING_REGISTER_COUNT 20
-extern uint16_t HoldingRegisters[HOLDING_REGISTER_COUNT];
-
-#define INPUT_REGISTER_COUNT 50
-extern uint16_t InputRegisters[INPUT_REGISTER_COUNT];
-
-#define COILS_COUNT 100
-extern uint8_t Coils[COILS_COUNT / 8];
-
-#define DISCRETE_INPUT_COUNT 50
-extern uint8_t DiscreteInputs[DISCRETE_INPUT_COUNT / 8];
+#define COILS_COUNT 100           // 线圈数量
+#define DISCRETE_INPUT_COUNT 50   // 离散输入数量
+#define HOLDING_REGISTER_COUNT 20 // 保持寄存器数量
+#define INPUT_REGISTER_COUNT 50   // 输入寄存器数量
 
 // modbus 的数据结构体
 typedef struct
 {
-    uint8_t MODBUS_SEVER_ID; // 从站地址
+    uint8_t MODBUS_SEVER_ID;   // 从站地址
+    UART_HandleTypeDef *huart; // UART 句柄
 
-    uint8_t Rx_Flag;        // 接收标志位
+    /* 接收数据 通用的*/
+    uint8_t Rx_Flag; // 接收标志位
+    uint8_t CRC_OK;
     uint8_t u8Data[256];    // 数据缓冲区，存放接收到的数据
     uint8_t u8SrverID;      // 从站地址
     uint8_t u8FunctionCode; // 功能码
+    uint16_t u16RegAddress; // 寄存器起始地址
 
-    uint16_t u16CoilsAddress; // 线圈地址
-    uint16_t u16CoilsNumber;  // 线圈数量
+    /* 读单个的数据 和写多个数据的 */
+    uint16_t u16RegNumber; // 线圈数量
 
-    // 特殊处理多个线圈
-    uint8_t u8byteCount; // 字节数
+    /* 写单个数据特有 */
+    uint16_t u16WriteValue; // 写如的数据
+
+    /* 写多个寄存器或线圈特有 */
+
+    uint8_t u8byteCount;        // 字节数
     uint16_t u16CoilsData[256]; // 线圈数据
 
+    /*通用CRC校验*/
     uint16_t u16CRC;            // CRC 校验码
     uint16_t u16CRC_Calculated; // 计算出的 CRC 校验码
 
-    uint8_t RX_Data[256];  // 接收数据缓冲区
+    /* 响应数据缓冲区*/
+
     uint8_t TX_Data[256];  // 发送数据缓冲区
     uint8_t u8TX_Data_Len; // 发送数据长度
 
@@ -89,9 +93,8 @@ typedef struct
 // 声明结构体
 extern ModbusData Modbus;
 
-void Modbus_Init(uint8_t device_address); // 可以设置设备地址
+void Modbus_Init(uint8_t device_address, UART_HandleTypeDef *huart); // 初始化 Modbus
 
-uint16_t calcCRC(uint8_t *Buffer, uint8_t u8length);
 void Modbus_ExtractData(void);
 uint16_t GetHoldingRegisterIndex(uint16_t logicalAddress);
 uint16_t ReadSingleHoldingRegister(uint16_t logicalAddress);

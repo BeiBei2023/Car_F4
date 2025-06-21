@@ -263,7 +263,7 @@ void sensor_data_update(void *argument)
     {
         AHT20_Read(&custom_aht20_data); // 读取AHT20传感器数据
         read_io_status();               // 读取 IO 状态
-        log_d("LVGL IS RUNNING...");
+
         if (time_changed == 1)
         {
             set_digital_clock_time(12, 0, 0); // 设置数字时钟时间为12:00:00

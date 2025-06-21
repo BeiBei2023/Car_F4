@@ -2035,11 +2035,6 @@
               <FilePath>..\BSP\LVGL\ui\generated\setup_scr_Humidity.c</FilePath>
             </File>
             <File>
-              <FileName>lv_font_Acme_Regular_35.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\BSP\LVGL\ui\generated\guider_fonts\lv_font_Acme_Regular_35.c</FilePath>
-            </File>
-            <File>
               <FileName>lv_font_montserratMedium_12.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\BSP\LVGL\ui\generated\guider_fonts\lv_font_montserratMedium_12.c</FilePath>

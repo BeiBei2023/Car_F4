@@ -2,6 +2,10 @@
   "folders": [
     {
       "path": "."
+    },
+    {
+      "name": "TEST",
+      "path": "../../../../../Document/PlatformIO/Projects/TEST"
     }
   ],
   "settings": {
@@ -16,7 +20,13 @@
       "qmi8658a.h": "c",
       "events_init.h": "c",
       "usart.h": "c",
-      "stm32f4xx_it.h": "c"
+      "stm32f4xx_it.h": "c",
+      "modbus.h": "c",
+      "iterator": "c",
+      "xmemory": "c",
+      "xutility": "c",
+      "uartcallback.h": "c",
+      "button_config.h": "c"
     }
   },
   "extensions": {}

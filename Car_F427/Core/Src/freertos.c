@@ -69,7 +69,7 @@ osThreadId_t MotorTaskHandle;
 const osThreadAttr_t MotorTask_attributes = {
   .name = "MotorTask",
   .stack_size = 1024 * 4,
-  .priority = (osPriority_t) osPriorityRealtime,
+  .priority = (osPriority_t) osPriorityRealtime1,
 };
 /* Definitions for ButtonScanTask */
 osThreadId_t ButtonScanTaskHandle;
@@ -96,8 +96,8 @@ const osThreadAttr_t Task_LVGL_attributes = {
 osThreadId_t Modbus_DataHandle;
 const osThreadAttr_t Modbus_Data_attributes = {
   .name = "Modbus_Data",
-  .stack_size = 1024 * 4,
-  .priority = (osPriority_t) osPriorityNormal2,
+  .stack_size = 2048 * 4,
+  .priority = (osPriority_t) osPriorityRealtime1,
 };
 /* Definitions for UI_DATA_TASK */
 osThreadId_t UI_DATA_TASKHandle;
